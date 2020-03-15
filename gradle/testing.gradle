@@ -38,6 +38,5 @@ jacocoTestCoverageVerification {
 }
 ////// reports //////
 coveralls {
-    jacocoReportPath "$buildDir/build/reports/jacoco/test/jacocoTestReport.xml"
-    pitReportPath "$buildDir/build/reports/pitest/mutations.xml"
+    jacocoReportPath "$buildDir/reports/jacoco/test/jacocoTestReport.xml"
 }
