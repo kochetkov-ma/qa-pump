@@ -23,6 +23,7 @@ subprojects {
     apply from: "$rootDir/gradle/dependencies.gradle"
     apply from: "$rootDir/gradle/checking.gradle"
     apply from: "$rootDir/gradle/setup.gradle"
+    apply from: "$rootDir/gradle/testing.gradle"
 }
 allprojects {
     repositories {
