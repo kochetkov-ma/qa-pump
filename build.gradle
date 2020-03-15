@@ -1,0 +1,64 @@
+plugins {
+    id 'java'
+    id 'jacoco'
+    id 'idea'
+    id 'pmd'
+    id 'checkstyle'
+
+    id 'com.github.ben-manes.versions' version '0.28.0'
+    id 'com.github.spotbugs' version '3.0.0'
+    id 'io.freefair.lombok' version '5.0.0-rc6'
+    id 'com.github.kt3k.coveralls' version '2.10.1'
+}
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'jacoco'
+    apply plugin: 'pmd'
+    apply plugin: 'checkstyle'
+
+    apply plugin: 'io.freefair.lombok'
+    apply plugin: 'com.github.spotbugs'
+    apply plugin: 'com.github.kt3k.coveralls'
+
+    apply from: "$rootDir/gradle/dependencies.gradle"
+    apply from: "$rootDir/gradle/checking.gradle"
+    apply from: "$rootDir/gradle/setup.gradle"
+    apply from: "$rootDir/gradle/testing.gradle"
+}
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+
+    generateLombokConfig.enabled = false
+}
+
+version = theVersion
+group = theGroup
+archivesBaseName = theArchivesBaseName
+
+compileJava {
+    options.encoding = 'UTF-8'
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = false
+    }
+}
+wrapper {
+    distributionType = Wrapper.DistributionType.ALL
+    gradleVersion = '6.2.2'
+}
+clean {
+    doLast {
+        def deleting = files("out", "allure-results")
+        println "Extra cleaning: $deleting.files"
+        delete deleting
+    }
+}
+dependencies { implementation gradleApi() }

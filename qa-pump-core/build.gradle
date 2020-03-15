@@ -1,0 +1,13 @@
+dependencies {
+    implementation "io.cucumber:cucumber-java:$cucumberVersion"
+    implementation "io.cucumber:cucumber-spring:$cucumberVersion"
+    implementation "org.springframework:spring-core:$springVersion"
+    implementation "org.springframework:spring-context:$springVersion"
+    implementation "com.typesafe:config:$typesafeVersion"
+
+    implementation "io.cucumber:cucumber-junit:$cucumberVersion"
+    implementation "org.springframework:spring-test:$springVersion"
+
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    implementation "javax.annotation:javax.annotation-api:$javaxVersion"
+}
