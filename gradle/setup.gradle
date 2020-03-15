@@ -1,25 +1,23 @@
-subprojects {
-    /**
-     * Create 'src' and 'test' directory for new module.
-     * Create 'build.gradle' and  'readme.md'
-     * You must create empty module folder before.
-     */
-    task setup {
-        group = 'build setup'; description = 'Print source set structure'
-        doLast {
-            println project
-            project.sourceSets.each { set ->
-                println "Source set $set"
-                set.allSource.srcDirs.each { println "Create directory if not exists '$it'"; mkdir it }
-                def readme = file("$rootProject.projectDir/gradle/templeate/readme.md")
-                def templateBuildGradle = file("$rootProject.projectDir/gradle/templeate/build.gradle")
-                if (!file("$projectDir/readme.md").exists()) {
-                    println "Copy $readme to $projectDir"; copy { from(readme); into(projectDir) }
-                }
-                if (!file("$projectDir/build.gradle").exists()) {
-                    println "Copy $templateBuildGradle to $projectDir"
-                    copy { from(templateBuildGradle); into(projectDir) }
-                }
+/**
+ * Create 'src' and 'test' directory for new module.
+ * Create 'build.gradle' and  'readme.md'
+ * You must create empty module folder before.
+ */
+task setup {
+    group = 'build setup'; description = 'Print source set structure'
+    doLast {
+        println project
+        project.sourceSets.each { set ->
+            println "Source set $set"
+            set.allSource.srcDirs.each { println "Create directory if not exists '$it'"; mkdir it }
+            def readme = file("$rootProject.projectDir/gradle/templeate/readme.md")
+            def templateBuildGradle = file("$rootProject.projectDir/gradle/templeate/build.gradle")
+            if (!file("$projectDir/readme.md").exists()) {
+                println "Copy $readme to $projectDir"; copy { from(readme); into(projectDir) }
+            }
+            if (!file("$projectDir/build.gradle").exists()) {
+                println "Copy $templateBuildGradle to $projectDir"
+                copy { from(templateBuildGradle); into(projectDir) }
             }
         }
     }

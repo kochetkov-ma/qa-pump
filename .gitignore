@@ -1,8 +1,10 @@
 /.gradle
 /.idea
 **/wrapper
-/build
-/keys
+**/build
+**/allure-result
+**/out
+**/keys
 
 # Gradle
 gradlew

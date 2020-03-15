@@ -5,18 +5,33 @@ plugins {
     id 'pmd'
     id 'checkstyle'
 
+    id 'com.github.ben-manes.versions' version '0.28.0'
     id 'com.github.spotbugs' version '3.0.0'
-    id 'info.solidsoft.pitest' version '1.4.7'
-    id 'io.freefair.lombok' version '5.0.0-rc4'
+    id 'io.freefair.lombok' version '5.0.0-rc6'
     id 'com.github.kt3k.coveralls' version '2.10.1'
 }
-apply from: './gradle/dependencies.gradle'
-apply from: './gradle/checking.gradle'
-apply from: './gradle/testing.gradle'
-apply from: './gradle/setup.gradle'
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'jacoco'
+    apply plugin: 'pmd'
+    apply plugin: 'checkstyle'
+
+    apply plugin: 'io.freefair.lombok'
+    apply plugin: 'com.github.spotbugs'
+    apply plugin: 'com.github.kt3k.coveralls'
+
+    apply from: "$rootDir/gradle/dependencies.gradle"
+    apply from: "$rootDir/gradle/checking.gradle"
+
+    apply from: "$rootDir/gradle/setup.gradle"
 }
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+    generateLombokConfig.enabled = false
+}
+
 version = theVersion
 group = theGroup
 archivesBaseName = theArchivesBaseName
@@ -38,7 +53,6 @@ wrapper {
     distributionType = Wrapper.DistributionType.ALL
     gradleVersion = '6.2.2'
 }
-generateLombokConfig.enabled = false
 clean {
     doLast {
         def deleting = files("out", "allure-results")
@@ -46,3 +60,4 @@ clean {
         delete deleting
     }
 }
+dependencies { implementation gradleApi() }
