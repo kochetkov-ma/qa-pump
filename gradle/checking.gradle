@@ -33,6 +33,5 @@ spotbugsMain {
 }
 ////// reports //////
 coveralls {
-    jacocoReportPath './build/reports/jacoco/test/jacocoTestReport.xml'
-    pitReportPath './build/reports/pitest/mutations.xml'
+    jacocoReportPath "$buildDir/build/reports/jacoco/test/jacocoTestReport.xml"
 }

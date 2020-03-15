@@ -22,13 +22,13 @@ subprojects {
 
     apply from: "$rootDir/gradle/dependencies.gradle"
     apply from: "$rootDir/gradle/checking.gradle"
-
     apply from: "$rootDir/gradle/setup.gradle"
 }
 allprojects {
     repositories {
         mavenCentral()
     }
+
     generateLombokConfig.enabled = false
 }
 
