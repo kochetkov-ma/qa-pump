@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 import static ru.iopump.qa.constants.PumpConstants.*;
+import static ru.iopump.qa.constants.PumpVariables.CONF_DIR_KEY;
 
 @Slf4j
 @Configuration
