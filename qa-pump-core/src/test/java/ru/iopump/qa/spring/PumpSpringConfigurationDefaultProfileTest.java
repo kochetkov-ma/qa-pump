@@ -8,10 +8,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import ru.iopump.qa.step.TestConfiguration;
 
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {PumpSpringConfiguration.class})
+@ContextConfiguration(classes = {TestConfiguration.class})
 @ActiveProfiles("test")
 public class PumpSpringConfigurationDefaultProfileTest {
 
