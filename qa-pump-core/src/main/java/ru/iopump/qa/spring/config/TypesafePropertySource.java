@@ -1,10 +1,10 @@
-package ru.iopump.qa.spring;
+package ru.iopump.qa.spring.config;
 
 import com.typesafe.config.Config;
 import org.springframework.core.env.PropertySource;
 
-public class TypesafeConfigPropertySource extends PropertySource<Config> {
-    public TypesafeConfigPropertySource(String name, Config source) {
+public class TypesafePropertySource extends PropertySource<Config> {
+    public TypesafePropertySource(String name, Config source) {
         super(name, source);
     }
 

@@ -9,15 +9,15 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="org.springframework" level="INFO">
+    <logger name="org.springframework" level="DEBUG">
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="org.springframework.beans.factory.support" level="ERROR">
+    <logger name="org.springframework.beans.factory.support" level="DEBUG">
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <root level="INFO">
+    <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>
