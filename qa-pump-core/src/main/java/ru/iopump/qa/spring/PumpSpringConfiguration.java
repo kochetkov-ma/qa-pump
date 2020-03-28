@@ -15,6 +15,8 @@ import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
@@ -24,17 +26,22 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.PropertySources;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.EncodedResource;
+import org.springframework.test.context.ContextConfiguration;
 import ru.iopump.qa.annotation.PumpApi;
 import ru.iopump.qa.util.Str;
 
 /**
- * Main class for Pump Framework configuration.
- * TODO: Describe this class for User
+ * Main class for Pump Framework configuration.</br>
+ * By default Qa Pump Framework use only this configuration class and this is enough for most situations.</br>
+ * If you want configure Qa Pump Framework yourself extend this class and use {@link ContextConfiguration} annotation.
+ * For more details see {@link io.cucumber.spring.SpringFactory} - you can use all this configuration possibilities</br>
+ * But we we recommend use only {@link ContextConfiguration} with you child configuration class.</br>
+ *
  */
 @Slf4j
-@Configuration
 @PumpApi("Glue Spring configuration")
-public class PumpSpringConfiguration {
+@ContextConfiguration(classes = PumpSpringConfiguration.class)
+public class PumpSpringConfiguration implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
     public PumpSpringConfiguration() {
         log.info("[CONFIGURATION] Base configuration class '{}' has been created", getClass());
@@ -94,5 +101,10 @@ public class PumpSpringConfiguration {
         }
         //noinspection rawtypes
         log.debug("[CONFIGURATION] Spring System Properties Config\n{}", Str.toPrettyString((Map) source.getSource()));
+    }
+
+    @Override
+    public void initialize(ConfigurableApplicationContext applicationContext) {
+        log.info("[CONFIGURATION] initialize");
     }
 }

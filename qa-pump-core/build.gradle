@@ -6,5 +6,5 @@ dependencies {
     implementation "com.typesafe:config:$typesafeVersion"
 
     implementation "io.cucumber:cucumber-junit:$cucumberVersion"
-    testImplementation "org.springframework:spring-test:$springVersion"
+    implementation "org.springframework:spring-test:$springVersion"
 }
