@@ -1,4 +1,4 @@
-package ru.iopump.qa.spring.config;
+package ru.iopump.qa.spring;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -12,7 +12,7 @@ import lombok.experimental.UtilityClass;
 import ru.iopump.qa.util.Str;
 
 @UtilityClass
-public class PumpConfigUtils {
+class PumpConfigUtils {
     private final static TypesafePropertySourceFactory DEFAULT_CONFIG_FACTORY = new TypesafePropertySourceFactory();
     private final static TypesafePropertySourceFactory TYPESAFE_CONFIG_FACTORY = DEFAULT_CONFIG_FACTORY;
 

@@ -1,5 +1,6 @@
 package ru.iopump.qa.cucumber;
 
+import io.cucumber.core.backend.CucumberBackendException;
 import io.cucumber.core.backend.ObjectFactory;
 import io.cucumber.core.cli.Main;
 import io.cucumber.core.options.Constants;
@@ -9,16 +10,24 @@ import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
 import java.util.Collection;
 import lombok.NonNull;
+import ru.iopump.qa.annotation.PumpApi;
+import ru.iopump.qa.constants.PumpConfigKeys;
+import ru.iopump.qa.exception.EmptyException;
 import ru.iopump.qa.exception.PumpCoreException;
-import ru.iopump.qa.spring.PumpSpringConfiguration;
+import ru.iopump.qa.spring.PumpConfiguration;
 import ru.iopump.qa.util.Str;
+import ru.iopump.qa.util.VarUtil;
 
 /**
  * QA Pump ObjectFactory. It decorate cucumber Spring object factory {@link SpringFactory}.
- * It adds only one configuration class extended {@link PumpSpringConfiguration} or use default.
+ * It adds only one configuration class extended {@link PumpConfiguration} or use default.
  */
+@PumpApi("Cucumber Object Factory")
 public final class PumpObjectFactory implements ObjectFactory {
+    private static boolean suppressFail = Boolean.parseBoolean(
+        VarUtil.getOrDefault(PumpConfigKeys.DONT_REFRESH_CONTEXT_ON_SPRING_ERROR_KEY, "true"));
     private static boolean loaded;
+    private static Exception failed;
     private final ObjectFactory delegate;
 
     public PumpObjectFactory() {
@@ -27,33 +36,13 @@ public final class PumpObjectFactory implements ObjectFactory {
         loaded = true;
     }
 
-    @Override
-    public void start() {
-        delegate.start();
-    }
-
-    @Override
-    public void stop() {
-        delegate.stop();
-    }
-
-    @Override
-    public boolean addClass(Class<?> glueClass) {
-        return delegate.addClass(glueClass);
-    }
-
-    @Override
-    public <T> T getInstance(Class<T> glueClass) {
-        return delegate.getInstance(glueClass);
-    }
-
     @NonNull
-    private static Class<? extends PumpSpringConfiguration> pumpSpringConfigurationClass() {
-        Collection<Class<PumpSpringConfiguration>> cfgClasses = findImplementations(PumpSpringConfiguration.class);
+    private static Class<? extends PumpConfiguration> pumpSpringConfigurationClass() {
+        Collection<Class<PumpConfiguration>> cfgClasses = findImplementations(PumpConfiguration.class);
         if (cfgClasses.isEmpty()) {
-            System.out.println("\nThere are no USER classes extended " + PumpSpringConfiguration.class +
-                ". Loaded DEFAULT QA Pump configuration: " + DefaultPumpSpringConfiguration.class + "\n");
-            return DefaultPumpSpringConfiguration.class;
+            System.out.println("\nThere are no USER classes extended " + PumpConfiguration.class +
+                ". Loaded DEFAULT QA Pump configuration: " + DefaultPumpConfiguration.class + "\n");
+            return DefaultPumpConfiguration.class;
         }
         if (cfgClasses.size() > 1) {
             throw PumpCoreException.of("Several QA Pump configuration classes found. " +
@@ -66,11 +55,10 @@ public final class PumpObjectFactory implements ObjectFactory {
         return cfgClasses.iterator().next();
     }
 
-
     @NonNull
     public static <T> Collection<Class<T>> findImplementations(@NonNull Class<T> abstractClass) {
         try (ScanResult scanResult = new ClassGraph().enableAllInfo()
-            .blacklistClasses(DefaultPumpSpringConfiguration.class.getName())
+            .blacklistClasses(DefaultPumpConfiguration.class.getName())
             .scan()) {
             final ClassInfoList controlClasses = scanResult.getSubclasses(abstractClass.getName());
             return controlClasses
@@ -100,6 +88,44 @@ public final class PumpObjectFactory implements ObjectFactory {
             Main.class);
     }
 
-    public static class DefaultPumpSpringConfiguration extends PumpSpringConfiguration {
+    @Override
+    public void start() {
+        if (failed != null && suppressFail) {
+            Thread.currentThread().interrupt();
+            throw new EmptyException("Context failed earlier on '{}'", failed.getClass().getSimpleName());
+        }
+        try {
+            delegate.start();
+        } catch (Exception contextCreatingException) {
+            failed = contextCreatingException;
+            throw contextCreatingException;
+        }
+    }
+
+    @Override
+    public void stop() {
+        delegate.stop();
+    }
+
+    @Override
+    public boolean addClass(Class<?> glueClass) {
+        return delegate.addClass(glueClass);
+    }
+
+    @Override
+    public <T> T getInstance(Class<T> glueClass) {
+        if (failed != null && suppressFail) {
+            Thread.currentThread().interrupt();
+            throw new EmptyException("Context failed earlier on '{}'", failed.getClass().getSimpleName());
+        }
+        try {
+            return delegate.getInstance(glueClass);
+        } catch (CucumberBackendException beanCreatingException) {
+            failed = beanCreatingException;
+            throw beanCreatingException;
+        }
+    }
+
+    public static class DefaultPumpConfiguration extends PumpConfiguration {
     }
 }

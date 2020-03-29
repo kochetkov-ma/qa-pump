@@ -1,19 +1,19 @@
 package ru.iopump.qa.cucumber;
 
-import static org.junit.Assert.*;
-
+import org.joor.Reflect;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import ru.iopump.qa.exception.PumpCoreException;
 
 public class PumpObjectFactoryTest {
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
     }
 
     @Test
@@ -36,8 +36,14 @@ public class PumpObjectFactoryTest {
     public void findImplementations() {
     }
 
-    @Test
+    @Test(expected = PumpCoreException.class)
     public void checkObjectFactoryLoaded() {
-        PumpObjectFactory.checkObjectFactoryLoaded();
+        try {
+            Reflect.onClass(PumpObjectFactory.class).set("loaded", false);
+            PumpObjectFactory.checkObjectFactoryLoaded();
+        } catch (PumpCoreException e) {
+            System.err.println(e.getLocalizedMessage());
+            throw e;
+        }
     }
 }

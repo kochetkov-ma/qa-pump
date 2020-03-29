@@ -3,6 +3,7 @@ package ru.iopump.qa.step;
 import io.cucumber.java.en.Given;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ru.iopump.qa.user.component.TestBean;
 
 @Slf4j
 @RequiredArgsConstructor

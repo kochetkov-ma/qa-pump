@@ -1,8 +1,7 @@
-package ru.iopump.qa.spring.config;
+package ru.iopump.qa.spring;
 
-import static ru.iopump.qa.spring.config.PumpConfigUtils.loadConfigFromReader;
-import static ru.iopump.qa.spring.config.PumpConfigUtils.prettyPrint;
-import static ru.iopump.qa.spring.config.PumpConfigUtils.resolveConfigWithSystem;
+import static ru.iopump.qa.spring.PumpConfigUtils.loadConfigFromReader;
+import static ru.iopump.qa.spring.PumpConfigUtils.prettyPrint;
 
 import com.typesafe.config.Config;
 import java.io.IOException;
@@ -14,7 +13,7 @@ import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PropertySourceFactory;
 
 @Slf4j
-public class TypesafePropertySourceFactory implements PropertySourceFactory {
+final class TypesafePropertySourceFactory implements PropertySourceFactory {
 
     @Override
     public PropertySource<Config> createPropertySource(String name, EncodedResource resource) throws IOException {

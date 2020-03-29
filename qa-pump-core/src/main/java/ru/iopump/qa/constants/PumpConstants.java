@@ -2,7 +2,9 @@ package ru.iopump.qa.constants;
 
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ru.iopump.qa.annotation.PumpApi;
 
+@PumpApi("Constants")
 @UtilityClass
 public class PumpConstants {
     /**
@@ -13,7 +15,7 @@ public class PumpConstants {
     /**
      * Default configuration file name.
      * Prefix = 'pump-'.
-     * Main name = {@link PumpVariables#SPRING_ACTIVE_PROFILE_KEY}.
+     * Main name = {@link PumpConfigKeys#SPRING_ACTIVE_PROFILE_KEY}.
      * Extension = '.conf'.
      * Full name = Prefix + Main name + Extension -> 'pump-default.conf' when Spring Profile = 'default'.
      * Full default path will be '/configuration/pump-default.conf' in classpath resources.

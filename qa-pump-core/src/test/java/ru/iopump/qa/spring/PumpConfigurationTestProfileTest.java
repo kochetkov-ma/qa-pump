@@ -11,8 +11,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {PumpSpringConfiguration.class})
-public class PumpSpringConfigurationTestProfileTest {
+@ContextConfiguration(classes = {PumpConfiguration.class})
+public class PumpConfigurationTestProfileTest {
 
     @Autowired
     private Environment environment;
