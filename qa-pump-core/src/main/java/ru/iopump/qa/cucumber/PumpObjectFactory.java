@@ -13,7 +13,7 @@ import lombok.NonNull;
 import ru.iopump.qa.annotation.PumpApi;
 import ru.iopump.qa.constants.PumpConfigKeys;
 import ru.iopump.qa.exception.EmptyException;
-import ru.iopump.qa.exception.PumpCoreException;
+import ru.iopump.qa.exception.PumpException;
 import ru.iopump.qa.spring.PumpConfiguration;
 import ru.iopump.qa.util.Str;
 import ru.iopump.qa.util.VarUtil;
@@ -45,7 +45,7 @@ public final class PumpObjectFactory implements ObjectFactory {
             return DefaultPumpConfiguration.class;
         }
         if (cfgClasses.size() > 1) {
-            throw PumpCoreException.of("Several QA Pump configuration classes found. " +
+            throw PumpException.of("Several QA Pump configuration classes found. " +
                     "Keep the only in classpath, please:\n{}",
                 Str.toPrettyString(cfgClasses)
             );
@@ -69,7 +69,7 @@ public final class PumpObjectFactory implements ObjectFactory {
 
     public static void checkObjectFactoryLoaded() {
         if (!loaded) {
-            throw PumpCoreException.of("Qa Pump Cucumber Object Loader is not loaded!\n" +
+            throw PumpException.of("Qa Pump Cucumber Object Loader is not loaded!\n" +
                     "You must add '{}' via Cucumber options." +
                     "\nInstructions:\n{}\n" +
                     "Old way: JDK SPI (ServiceLoader) - see JavaDoc '{}'\n",

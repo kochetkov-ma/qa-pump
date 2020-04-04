@@ -3,7 +3,8 @@ package ru.iopump.qa.exception;
 /**
  * Exception with no stacktrace.
  */
-public class EmptyException extends PumpCoreException {
+@SuppressWarnings("unused")
+public class EmptyException extends PumpException {
 
     private static final long serialVersionUID = 6943595892576399571L;
 

@@ -13,8 +13,10 @@ ext {
     cucumberVersion = '5.5.0'
     springVersion = '5.2.4.RELEASE'
     typesafeVersion = '1.4.0'
+    groovyVersion = '3.0.2'
 }
 dependencies {
+    implementation "org.codehaus.groovy:groovy-all:$groovyVersion"
     /* QA lib */
     implementation ("ru.iopump.qa:qa-tools:$qaLibVersion") { transitive false }
     /* Reflection lib */

@@ -29,7 +29,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.test.context.ContextConfiguration;
 import ru.iopump.qa.annotation.PumpApi;
-import ru.iopump.qa.exception.PumpCoreException;
+import ru.iopump.qa.exception.PumpException;
 import ru.iopump.qa.util.Str;
 
 /**
@@ -75,7 +75,7 @@ public class PumpConfiguration implements ApplicationContextInitializer<Configur
         try {
             propertySource = PumpConfigUtils.getConfigFactory().createPropertySource("typesafe", source);
         } catch (IOException e) {
-            throw PumpCoreException.of("Error loading typesafe configuration", e);
+            throw PumpException.of("Error loading typesafe configuration", e);
         }
         environment.getPropertySources().addLast(propertySource);
 

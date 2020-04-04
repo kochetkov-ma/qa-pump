@@ -4,7 +4,7 @@ import org.joor.Reflect;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import ru.iopump.qa.exception.PumpCoreException;
+import ru.iopump.qa.exception.PumpException;
 
 public class PumpObjectFactoryTest {
 
@@ -36,12 +36,12 @@ public class PumpObjectFactoryTest {
     public void findImplementations() {
     }
 
-    @Test(expected = PumpCoreException.class)
+    @Test(expected = PumpException.class)
     public void checkObjectFactoryLoaded() {
         try {
             Reflect.onClass(PumpObjectFactory.class).set("loaded", false);
             PumpObjectFactory.checkObjectFactoryLoaded();
-        } catch (PumpCoreException e) {
+        } catch (PumpException e) {
             System.err.println(e.getLocalizedMessage());
             throw e;
         }
