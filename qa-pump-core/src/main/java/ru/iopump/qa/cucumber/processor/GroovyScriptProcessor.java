@@ -5,12 +5,13 @@ import static ru.iopump.qa.component.groovy.GroovyUtil.gStringContent;
 import static ru.iopump.qa.component.groovy.GroovyUtil.isGString;
 import static ru.iopump.qa.component.groovy.GroovyUtil.isString;
 import static ru.iopump.qa.component.groovy.GroovyUtil.stringContent;
+import static ru.iopump.qa.constants.PumpConfigKeys.PROCESSOR_STRICT;
 
 import groovy.lang.GString;
 import groovy.lang.GroovyRuntimeException;
 import javax.annotation.Nullable;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.iopump.qa.component.groovy.GroovyEvaluator;
 import ru.iopump.qa.exception.ProcessorException;
@@ -18,11 +19,16 @@ import ru.iopump.qa.util.Str;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class GroovyScriptProcessor implements Processor<Object, GroovyRuntimeException> {
 
     private final GroovyEvaluator evaluator;
     private final boolean strictMode;
+
+    public GroovyScriptProcessor(GroovyEvaluator evaluator,
+                                 @Value("${" + PROCESSOR_STRICT + ":false}") boolean strictMode) {
+        this.evaluator = evaluator;
+        this.strictMode = strictMode;
+    }
 
     public ProcessResult<Object, GroovyRuntimeException> process(@Nullable String rawGherkinArgument) {
         var resultBuilder = ProcessResultImpl.<Object, GroovyRuntimeException>builder();

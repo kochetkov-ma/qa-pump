@@ -46,4 +46,6 @@ public class PumpConfigKeys {
      * Default = true.
      */
     public final static String DONT_REFRESH_CONTEXT_ON_SPRING_ERROR_KEY = "pump.env.single.context";
+
+    public final static String PROCESSOR_STRICT = "pump.processor.strict";
 }

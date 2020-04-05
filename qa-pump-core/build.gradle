@@ -7,4 +7,7 @@ dependencies {
 
     implementation "io.cucumber:cucumber-junit:$cucumberVersion"
     implementation "org.springframework:spring-test:$springVersion"
+
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    implementation "javax.annotation:javax.annotation-api:$javaxVersion"
 }
