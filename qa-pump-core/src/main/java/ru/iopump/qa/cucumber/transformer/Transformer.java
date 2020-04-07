@@ -1,19 +1,29 @@
 package ru.iopump.qa.cucumber.transformer;
 
 import java.lang.reflect.Type;
+import java.util.function.Supplier;
+import javax.annotation.Nullable;
 import lombok.NonNull;
 import ru.iopump.qa.annotation.PumpApi;
 import ru.iopump.qa.cucumber.processor.ProcessResult;
 import ru.iopump.qa.cucumber.processor.Processor;
 
 @PumpApi
-public interface Transformer<TARGET, P_TYPE, P_EXCEPTION extends RuntimeException, PROCESSOR extends Processor<P_TYPE, P_EXCEPTION>> {
+public interface Transformer<TARGET, HELPER, PROCESSOR extends Processor<HELPER>> {
 
     int priority();
 
+    @NonNull
     Type targetType();
 
-    Class<PROCESSOR> preProcessorClass();
+    @Nullable
+    Supplier<HELPER> helperSupplier();
 
-    TARGET transform(@NonNull ProcessResult<P_TYPE, P_EXCEPTION> gherkinArgumentAfterProcessing);
+    @NonNull
+    Class<PROCESSOR> processorClass();
+
+    @Nullable
+    TARGET transform(@NonNull ProcessResult gherkinArgumentAfterProcessing);
+
+    String toString();
 }

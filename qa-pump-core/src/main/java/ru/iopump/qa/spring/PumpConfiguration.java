@@ -37,7 +37,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.test.context.ContextConfiguration;
 import ru.iopump.qa.annotation.PumpApi;
-import ru.iopump.qa.cucumber.processor.GroovyScriptProcessor;
+import ru.iopump.qa.cucumber.processor.GroovyProcessor;
+import ru.iopump.qa.cucumber.transformer.LastResortTransformer;
 import ru.iopump.qa.cucumber.transformer.ObjectTransformer;
 import ru.iopump.qa.cucumber.transformer.StringTransformer;
 import ru.iopump.qa.cucumber.type.PumpTypeResolver;
@@ -110,10 +111,12 @@ public class PumpConfiguration implements ApplicationContextInitializer<Configur
             BeanDefinitionBuilder.rootBeanDefinition(ObjectTransformer.class).getBeanDefinition());
         registry.registerBeanDefinition("stringTransformer",
             BeanDefinitionBuilder.rootBeanDefinition(StringTransformer.class).getBeanDefinition());
+        registry.registerBeanDefinition("lastHopeTransformer",
+            BeanDefinitionBuilder.rootBeanDefinition(LastResortTransformer.class).getBeanDefinition());
 
         // ru.iopump.qa.cucumber.processor
         registry.registerBeanDefinition("groovyScriptProcessor",
-            BeanDefinitionBuilder.rootBeanDefinition(GroovyScriptProcessor.class).getBeanDefinition());
+            BeanDefinitionBuilder.rootBeanDefinition(GroovyProcessor.class).getBeanDefinition());
 
         // ru.iopump.qa.cucumber.type
         registry.registerBeanDefinition("typeResolver",

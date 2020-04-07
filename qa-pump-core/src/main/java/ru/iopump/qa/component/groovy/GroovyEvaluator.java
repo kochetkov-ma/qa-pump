@@ -18,5 +18,5 @@ public interface GroovyEvaluator {
      * @param groovyScript groovy script or GString
      * @return The result as Object.
      */
-    Object evaluateScript(@NonNull String groovyScript);
+    Object evaluate(@NonNull String groovyScript);
 }

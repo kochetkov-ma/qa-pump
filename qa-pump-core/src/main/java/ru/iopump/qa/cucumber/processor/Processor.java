@@ -1,10 +1,11 @@
 package ru.iopump.qa.cucumber.processor;
 
 import javax.annotation.Nullable;
+import lombok.NonNull;
 import ru.iopump.qa.annotation.PumpApi;
 
 @PumpApi
-public interface Processor<RESULT, EXCEPTION extends RuntimeException> {
+public interface Processor<HELPER> {
 
-    ProcessResult<RESULT, EXCEPTION> process(@Nullable String rawGherkinArgument);
+    ProcessResult process(@NonNull String rawGherkinArgument, @Nullable HELPER helper);
 }

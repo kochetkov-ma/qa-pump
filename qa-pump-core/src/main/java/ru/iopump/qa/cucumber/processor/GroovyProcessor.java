@@ -7,35 +7,47 @@ import static ru.iopump.qa.component.groovy.GroovyUtil.isString;
 import static ru.iopump.qa.component.groovy.GroovyUtil.stringContent;
 import static ru.iopump.qa.constants.PumpConfigKeys.PROCESSOR_STRICT;
 
+import com.google.common.collect.ImmutableMap;
 import groovy.lang.GString;
 import groovy.lang.GroovyRuntimeException;
 import javax.annotation.Nullable;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.iopump.qa.component.groovy.GroovyEvaluator;
+import ru.iopump.qa.component.TestContext;
+import ru.iopump.qa.component.groovy.GroovyScript;
 import ru.iopump.qa.exception.ProcessorException;
 import ru.iopump.qa.util.Str;
 
 @Slf4j
 @Component
-public class GroovyScriptProcessor implements Processor<Object, GroovyRuntimeException> {
-
-    private final GroovyEvaluator evaluator;
+public class GroovyProcessor implements Processor<GroovyScript> {
+    private final TestContext context;
     private final boolean strictMode;
 
-    public GroovyScriptProcessor(GroovyEvaluator evaluator,
-                                 @Value("${" + PROCESSOR_STRICT + ":false}") boolean strictMode) {
-        this.evaluator = evaluator;
+    public GroovyProcessor(TestContext context, @Value("${" + PROCESSOR_STRICT + ":false}") boolean strictMode) {
+
         this.strictMode = strictMode;
+        this.context = context;
     }
 
-    public ProcessResult<Object, GroovyRuntimeException> process(@Nullable String rawGherkinArgument) {
-        var resultBuilder = ProcessResultImpl.<Object, GroovyRuntimeException>builder();
+    public ProcessResult process(@Nullable String rawGherkinArgument, @NonNull GroovyScript evaluator) {
+        if (evaluator.getBindingMap() != null) {
+            // add context to script and merge with exist
+            evaluator = evaluator.withBindingMap(
+                ImmutableMap.<String, Object>builder().putAll(evaluator.getBindingMap()).putAll(context.snapshot()).build()
+            );
+        } else {
+            // add context to script
+            evaluator = evaluator.withBindingMap(context.snapshot());
+        }
+
+        var resultBuilder = ProcessResultImpl.builder();
         Object result = rawGherkinArgument;
         try {
             // Try evaluate as Groovy script
-            result = evaluator.evaluateScript(rawGherkinArgument);
+            result = evaluator.evaluate(rawGherkinArgument);
             if (result instanceof GString) {
                 // Groovy String must be convert to Java String
                 resultBuilder.result(Str.toStr(result));
@@ -69,7 +81,7 @@ public class GroovyScriptProcessor implements Processor<Object, GroovyRuntimeExc
             // If it was Script -> try as GString
             if (!isString(rawGherkinArgument) && !isGString(rawGherkinArgument)) {
                 try {
-                    result = evaluator.evaluateScript(asGString(rawGherkinArgument));
+                    result = evaluator.evaluate(asGString(rawGherkinArgument));
                 } catch (GroovyRuntimeException gException) {
                     resultBuilder.processException(gException);
                 }

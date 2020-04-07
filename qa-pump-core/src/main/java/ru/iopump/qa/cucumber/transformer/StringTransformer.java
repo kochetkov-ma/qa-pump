@@ -1,12 +1,11 @@
 package ru.iopump.qa.cucumber.transformer;
 
-import groovy.lang.GroovyRuntimeException;
 import java.lang.reflect.Type;
+import java.util.function.Supplier;
 import lombok.NonNull;
-import org.springframework.stereotype.Component;
+import ru.iopump.qa.component.groovy.GroovyScript;
 import ru.iopump.qa.cucumber.processor.ProcessResult;
 
-@Component
 public final class StringTransformer extends AbstractGroovyTransformer<String> {
 
     @Override
@@ -15,7 +14,12 @@ public final class StringTransformer extends AbstractGroovyTransformer<String> {
     }
 
     @Override
-    public String transform(@NonNull ProcessResult<Object, GroovyRuntimeException> gherkinAfterProcessing) {
+    public Supplier<GroovyScript> helperSupplier() {
+        return GroovyScript::create;
+    }
+
+    @Override
+    public String transform(@NonNull ProcessResult gherkinAfterProcessing) {
         return gherkinAfterProcessing.getResultAsString();
     }
 }

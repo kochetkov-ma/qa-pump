@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ru.iopump.qa.cucumber.transformer.LastResortTransformer;
 import ru.iopump.qa.cucumber.transformer.Transformer;
 
 @SuppressWarnings("rawtypes")
@@ -19,6 +20,7 @@ public class TransformerProvider {
 
     private final Collection<Transformer> transformerCollection;
     private final ObjectMapper objectMapper;
+    private final LastResortTransformer lastResortTransformer;
 
     public Collection<Transformer> getAll() {
         return Collections.unmodifiableCollection(transformerCollection);
@@ -32,6 +34,10 @@ public class TransformerProvider {
 
     public Collection<Transformer> findByTypeSorted(@NonNull Type baseTargetType) {
         return sort(findByType(baseTargetType), baseTargetType);
+    }
+
+    public LastResortTransformer getLastResortTransformer() {
+        return lastResortTransformer;
     }
 
     //// PACKAGE

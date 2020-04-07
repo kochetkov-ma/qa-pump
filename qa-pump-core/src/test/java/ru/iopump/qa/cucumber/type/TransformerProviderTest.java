@@ -14,7 +14,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import ru.iopump.qa.cucumber.processor.GroovyScriptProcessor;
+import ru.iopump.qa.cucumber.processor.GroovyProcessor;
 import ru.iopump.qa.cucumber.transformer.Transformer;
 
 public class TransformerProviderTest {
@@ -25,7 +25,7 @@ public class TransformerProviderTest {
     @Before
     public void setUp() {
         mapper = new ObjectMapper();
-        provider = new TransformerProvider(transformerCollection(), mapper);
+        provider = new TransformerProvider(transformerCollection(), mapper, null);
     }
 
 
@@ -186,7 +186,7 @@ public class TransformerProviderTest {
         Transformer transformer = Mockito.mock(Transformer.class);
         Mockito.when(transformer.targetType()).thenReturn(type);
         Mockito.when(transformer.priority()).thenReturn(priority);
-        Mockito.when(transformer.preProcessorClass()).thenReturn(GroovyScriptProcessor.class);
+        Mockito.when(transformer.processorClass()).thenReturn(GroovyProcessor.class);
         Mockito.when(transformer.toString()).thenReturn(type.toString());
         return transformer;
     }

@@ -5,14 +5,14 @@ import lombok.NonNull;
 import ru.iopump.qa.annotation.PumpApi;
 
 @PumpApi
-public interface ProcessResult<RESULT, EXCEPTION extends RuntimeException> {
+public interface ProcessResult {
     /**
      * Result after processing.
      * Rule: If suppressed exception not exist - result MUST be exist,
      *
      * @return Result of processing.
      */
-    Optional<RESULT> getResult();
+    Optional<Object> getResult();
 
     /**
      * String representation of result.
@@ -32,7 +32,7 @@ public interface ProcessResult<RESULT, EXCEPTION extends RuntimeException> {
      *
      * @return Suppressed exceptions during processing.
      */
-    Optional<EXCEPTION> getProcessException();
+    Optional<? extends RuntimeException> getProcessException();
 
     /**
      * Check if processing was success but result is 'null'.

@@ -1,5 +1,6 @@
 package ru.iopump.qa.cucumber.processor;
 
+import groovy.lang.GroovyRuntimeException;
 import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
@@ -7,19 +8,19 @@ import lombok.ToString;
 
 @ToString
 @Builder
-class ProcessResultImpl<RESULT, EXCEPTION extends RuntimeException> implements ProcessResult<RESULT, EXCEPTION> {
-    RESULT result;
+class ProcessResultImpl implements ProcessResult {
+    Object result;
     @Getter
     String resultAsString;
-    EXCEPTION processException;
+    GroovyRuntimeException processException;
 
     @Override
-    public Optional<RESULT> getResult() {
+    public Optional<Object> getResult() {
         return Optional.ofNullable(result);
     }
 
     @Override
-    public Optional<EXCEPTION> getProcessException() {
+    public Optional<GroovyRuntimeException> getProcessException() {
         return Optional.ofNullable(processException);
     }
 }

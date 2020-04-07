@@ -3,12 +3,18 @@ package ru.iopump.qa.cucumber.transformer;
 import java.lang.reflect.Type;
 import java.util.function.Supplier;
 import lombok.NonNull;
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
 import ru.iopump.qa.component.groovy.GroovyScript;
 import ru.iopump.qa.cucumber.processor.ProcessResult;
 import ru.iopump.qa.exception.PumpException;
 
-public final class ObjectTransformer extends AbstractGroovyTransformer<Object> {
+@RequiredArgsConstructor
+public final class LastResortTransformer extends AbstractGroovyTransformer<Object> {
+
+    @Override
+    public int priority() {
+        return Integer.MIN_VALUE;
+    }
 
     @Override
     public Type targetType() {
@@ -22,9 +28,6 @@ public final class ObjectTransformer extends AbstractGroovyTransformer<Object> {
 
     @Override
     public Object transform(@NonNull ProcessResult gherkinAfterProcessing) {
-        return gherkinAfterProcessing.getResult().orElseThrow(() ->
-            PumpException.of("Object transformer error, because Object result is empty '{}'", gherkinAfterProcessing)
-                .withCause(gherkinAfterProcessing.getProcessException().orElse(null))
-        );
+        return gherkinAfterProcessing.getResult().orElse(gherkinAfterProcessing.getResultAsString());
     }
 }
