@@ -65,7 +65,7 @@ public class PumpConfiguration implements ApplicationContextInitializer<Configur
     BeanDefinitionRegistryPostProcessor {
 
     public PumpConfiguration() {
-        log.info("[CONFIGURATION] Base configuration class '{}' has been created", getClass());
+        log.debug("[CONFIGURATION] Base configuration class '{}' has been created", getClass().getName());
     }
 
     /**

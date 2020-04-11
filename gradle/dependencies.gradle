@@ -10,7 +10,7 @@ ext {
     classgraphVersion = '4.8.65'
     joorVersion = '0.9.12'
 
-    cucumberVersion = '5.5.0'
+    cucumberVersion = '5.6.0'
     springVersion = '5.2.4.RELEASE'
     typesafeVersion = '1.4.0'
     groovyVersion = '3.0.2'
