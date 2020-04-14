@@ -1,9 +1,9 @@
-package ru.iopump.qa.step;
+package ru.iopump.qa.glue;
 
 import io.cucumber.java.en.Given;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ru.iopump.qa.step.type.StepEnum;
+import ru.iopump.qa.glue.type.StepEnum;
 import ru.iopump.qa.user.component.TestBean;
 
 @Slf4j

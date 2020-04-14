@@ -37,6 +37,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.test.context.ContextConfiguration;
 import ru.iopump.qa.annotation.PumpApi;
+import ru.iopump.qa.constants.PumpConstants;
+import ru.iopump.qa.cucumber.PumpObjectFactory;
 import ru.iopump.qa.cucumber.processor.GroovyProcessor;
 import ru.iopump.qa.cucumber.transformer.LastResortTransformer;
 import ru.iopump.qa.cucumber.transformer.ObjectTransformer;
@@ -44,6 +46,7 @@ import ru.iopump.qa.cucumber.transformer.StringTransformer;
 import ru.iopump.qa.cucumber.type.PumpTypeResolver;
 import ru.iopump.qa.cucumber.type.TransformerProvider;
 import ru.iopump.qa.exception.PumpException;
+import ru.iopump.qa.spring.scope.FeatureScope;
 import ru.iopump.qa.util.Str;
 
 /**
@@ -61,11 +64,11 @@ import ru.iopump.qa.util.Str;
     COMPONENT_SCAN_PACKAGE_EXTRA_DEFAULT,
     "${" + USER_COMPONENT_PACKAGE_KEY + ":" + COMPONENT_SCAN_PACKAGE_USER_DEFAULT + "}"
 })
-public class PumpConfiguration implements ApplicationContextInitializer<ConfigurableApplicationContext>,
-    BeanDefinitionRegistryPostProcessor {
+public class PumpConfiguration
+    implements ApplicationContextInitializer<ConfigurableApplicationContext>, BeanDefinitionRegistryPostProcessor {
 
     public PumpConfiguration() {
-        log.debug("[CONFIGURATION] Base configuration class '{}' has been created", getClass().getName());
+        PumpObjectFactory.checkObjectFactoryLoaded();
     }
 
     /**
@@ -152,6 +155,6 @@ public class PumpConfiguration implements ApplicationContextInitializer<Configur
 
     @Override
     public void postProcessBeanFactory(@Nonnull ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        /* nothing */
+        beanFactory.registerScope(PumpConstants.FEATURE_SCOPE, new FeatureScope());
     }
 }
