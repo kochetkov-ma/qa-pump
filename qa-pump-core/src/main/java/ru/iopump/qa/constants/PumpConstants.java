@@ -1,16 +1,33 @@
 package ru.iopump.qa.constants;
 
-import lombok.experimental.UtilityClass;
+import static io.cucumber.spring.CucumberTestContext.SCOPE_CUCUMBER_GLUE;
+import static ru.iopump.qa.spring.scope.FeatureScope.SCOPE_PUMP_FEATURE;
+
 import org.apache.commons.lang3.StringUtils;
 import ru.iopump.qa.annotation.PumpApi;
 
 @PumpApi("Constants")
-@UtilityClass
-public class PumpConstants {
+public final class PumpConstants {
+    public PumpConstants() {
+        throw new AssertionError("utility class");
+    }
+
     /**
      * Default configuration folder in classpath resources.
      */
-    public final static String CONF_DIR_DEFAULT = "/configuration";
+    public static final String CONF_DIR_DEFAULT = "/configuration";
+
+    /**
+     * Use as bean scope @Scope(PumpConstants.FEATURE_SCOPE).
+     * Bean will life
+     */
+    public static final String FEATURE_SCOPE = SCOPE_PUMP_FEATURE;
+
+    /**
+     * Use as bean scope @Scope(PumpConstants.SCENARIO_SCOPE)
+     */
+    public static final String SCENARIO_SCOPE = SCOPE_CUCUMBER_GLUE;
+
 
     /**
      * Default configuration file name.

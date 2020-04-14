@@ -1,4 +1,4 @@
-package ru.iopump.qa.step.type;
+package ru.iopump.qa.glue.type;
 
 import lombok.Value;
 

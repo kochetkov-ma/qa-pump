@@ -4,15 +4,16 @@ import com.google.common.base.Preconditions;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.NonNull;
-import lombok.experimental.UtilityClass;
 import ru.iopump.qa.annotation.PumpApi;
 
-@UtilityClass
 @PumpApi
-public class GroovyUtil {
+public final class GroovyUtil {
+    public GroovyUtil() {
+        throw new AssertionError("utility class");
+    }
 
-    public final Pattern G_STRING = Pattern.compile("^(\"|\"\"\")(.*)(\"|\"\"\")$", Pattern.MULTILINE);
-    public final Pattern STRING = Pattern.compile("^('|''')(.*)('|''')$", Pattern.MULTILINE);
+    public static final Pattern G_STRING = Pattern.compile("^(\"|\"\"\")(.*)(\"|\"\"\")$", Pattern.MULTILINE);
+    public static final Pattern STRING = Pattern.compile("^('|''')(.*)('|''')$", Pattern.MULTILINE);
 
     public static boolean isGString(@NonNull String candidate) {
         return G_STRING.matcher(candidate).matches();

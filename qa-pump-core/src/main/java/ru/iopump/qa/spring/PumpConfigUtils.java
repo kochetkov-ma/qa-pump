@@ -8,11 +8,14 @@ import java.io.IOException;
 import java.io.Reader;
 import javax.annotation.Nullable;
 import lombok.NonNull;
-import lombok.experimental.UtilityClass;
 import ru.iopump.qa.util.Str;
 
-@UtilityClass
-class PumpConfigUtils {
+
+final class PumpConfigUtils {
+    public PumpConfigUtils() {
+        throw new AssertionError("utility class");
+    }
+
     private final static TypesafePropertySourceFactory DEFAULT_CONFIG_FACTORY = new TypesafePropertySourceFactory();
     private final static TypesafePropertySourceFactory TYPESAFE_CONFIG_FACTORY = DEFAULT_CONFIG_FACTORY;
 
