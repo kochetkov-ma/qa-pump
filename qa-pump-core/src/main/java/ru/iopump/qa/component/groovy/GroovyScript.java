@@ -26,30 +26,30 @@ public class GroovyScript implements GroovyEvaluator {
     private final boolean tryAsMethod;
     private final Map<String, Object> bindingMap;
     private final Object delegatedObject;
-    private final List<Import> staticImports;
+    private final Imports imports;
 
     public static GroovyScript create() {
         return new GroovyScript(EvaluatingMode.CLOSURE, true, null, null, null);
     }
 
     public GroovyScript withMode(EvaluatingMode mode) {
-        return new GroovyScript(mode, tryAsMethod, bindingMap, delegatedObject, staticImports);
+        return new GroovyScript(mode, tryAsMethod, bindingMap, delegatedObject, imports);
     }
 
     public GroovyScript withTryAsMethod(boolean tryAsMethod) {
-        return new GroovyScript(mode, tryAsMethod, bindingMap, delegatedObject, staticImports);
+        return new GroovyScript(mode, tryAsMethod, bindingMap, delegatedObject, imports);
     }
 
     public GroovyScript withBindingMap(@Nullable Map<String, Object> bindingMap) {
-        return new GroovyScript(mode, tryAsMethod, bindingMap, delegatedObject, staticImports);
+        return new GroovyScript(mode, tryAsMethod, bindingMap, delegatedObject, imports);
     }
 
     public GroovyScript withDelegatedObject(@Nullable Object delegatedObject) {
-        return new GroovyScript(mode, tryAsMethod, bindingMap, delegatedObject, staticImports);
+        return new GroovyScript(mode, tryAsMethod, bindingMap, delegatedObject, imports);
     }
 
-    public GroovyScript withStaticImports(@Nullable List<Import> staticImports) {
-        return new GroovyScript(mode, tryAsMethod, bindingMap, delegatedObject, staticImports);
+    public GroovyScript withStaticImports(@Nullable List<Imports> staticImports) {
+        return new GroovyScript(mode, tryAsMethod, bindingMap, delegatedObject, imports);
     }
 
     @Override
@@ -60,11 +60,11 @@ public class GroovyScript implements GroovyEvaluator {
         }
 
         final ImportCustomizer customizer = new ImportCustomizer();
-        if (!CollectionUtils.isEmpty(staticImports)) {
-            /* TODO: [critical] fix imports and redo Import class to ImportSet with all type of imports */
-            customizer.addStaticStars(staticImports.stream().filter(Import::isStart).map(Import::getImportSpec).toArray(String[]::new));
-            /* TODO: [critical] fix imports and redo Import class to ImportSet with all type of imports */
-            customizer.addStarImports(staticImports.stream().filter(Import::isNotStar).map(Import::getImportSpec).toArray(String[]::new));
+        if (imports != null) {
+            customizer.addImports(imports.simpleImports());
+            customizer.addStarImports(imports.starImports());
+            imports.staticImports().forEach(i -> customizer.addStaticImport(i.getKey(), i.getValue()));
+            customizer.addStaticStars(imports.staticStarImports());
         }
         compiler.addCompilationCustomizers(customizer);
         if (delegatedObject != null && mode == EvaluatingMode.SCRIPT) {

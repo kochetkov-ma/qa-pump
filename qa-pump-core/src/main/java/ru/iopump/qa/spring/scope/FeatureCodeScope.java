@@ -75,12 +75,11 @@ public class FeatureCodeScope {
 
     public static void stopExecution() {
         STARTED.set(false);
-        eventPublisher = null;
         beforeEventPublisher.clear();
+        eventPublisher = null;
         contextSupplier = null;
         contextRemove = null;
         FeatureScope.RUNNER_TYPE = null;
-        Reflect.onClass(PumpObjectFactory.class).call("resetContextUnsafeInternal").get();
     }
 
     public static void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {

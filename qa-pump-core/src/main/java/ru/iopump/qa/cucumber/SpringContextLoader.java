@@ -13,25 +13,42 @@ import ru.iopump.qa.exception.PumpException;
 import ru.iopump.qa.spring.PumpConfiguration;
 import ru.iopump.qa.util.Str;
 
-enum ContextImpl {
-    INSTANCE;
+class SpringContextLoader {
+    private static SpringContextLoader INSTANCE;
 
-    private final AtomicBoolean frozen = new AtomicBoolean();
-    private ObjectFactory delegate;
-    private CountDownLatch latch;
+    private final AtomicBoolean init = new AtomicBoolean();
+    private final ObjectFactory delegate;
+    private final CountDownLatch latch;
 
-    ContextImpl() {
+    static synchronized SpringContextLoader instance() {
+        if (INSTANCE == null) {
+            INSTANCE = new SpringContextLoader();
+        }
+        return INSTANCE;
+    }
+
+    static synchronized void dispose() {
+        if (INSTANCE != null) {
+            INSTANCE.stopGlue();
+        }
+        INSTANCE = null;
+    }
+
+    SpringContextLoader() {
         latch = new CountDownLatch(1);
         delegate = new SpringFactory();
         delegate.addClass(pumpSpringConfigurationClass());
     }
 
     void startSpringContext() throws InterruptedException {
-        if (frozen.compareAndSet(false, true)) { // freeze context
+        if (init.compareAndSet(false, true)) { // freeze context
+            System.out.println("[PUMP] SpringContextLoader context is starting from thread " + Thread.currentThread());
             delegate.start();
+            System.out.println("[PUMP] SpringContextLoader context has been started from thread " + Thread.currentThread());
             latch.countDown(); // Open latch on ready context
         } else {
             latch.await(); // Wait for context starting
+            System.out.println("[PUMP] SpringContextLoader context has been already started from thread " + Thread.currentThread());
         }
     }
 
@@ -40,20 +57,12 @@ enum ContextImpl {
     }
 
     boolean addClass(Class<?> glueClass) {
-        if (frozen.get()) {
-            throw new IllegalStateException("You cannot add glue after Spring Context init. Context has been frozen whole execution");
-        }
+        if (init.get()) return false; // context frozen
         return delegate.addClass(glueClass);
     }
 
     <T> T getInstance(Class<T> glueClass) {
         return delegate.getInstance(glueClass);
-    }
-
-    void resetUnsafeInternal() {
-        delegate = new SpringFactory();
-        latch = new CountDownLatch(1);
-        frozen.set(false);
     }
 
     @NonNull

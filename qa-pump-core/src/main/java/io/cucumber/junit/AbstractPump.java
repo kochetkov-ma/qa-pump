@@ -27,7 +27,9 @@ abstract class AbstractPump<DELEGATE extends ParentRunner<ParentRunner<?>>> exte
 
     public AbstractPump(Class<?> testClass) throws InitializationError {
         super(testClass);
-        FeatureCodeScope.checkRunnerOrSet(null, RunnerType.PUMP_JUNIT);
+        FeatureCodeScope.stopExecution(); // Reset Feature Context
+        Reflect.onClass(PumpObjectFactory.class).call("resetContextUnsafeInternal").get(); // Reset Spring Factory
+        FeatureCodeScope.checkRunnerOrSet(null, RunnerType.PUMP_JUNIT); // Add new Runner and start Test execution
         cucumberDelegate = newCucumberDelegate(testClass);
     }
 

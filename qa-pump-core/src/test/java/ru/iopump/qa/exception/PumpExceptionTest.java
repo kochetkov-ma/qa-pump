@@ -59,12 +59,12 @@ public class PumpExceptionTest {
 
         assertThat(PumpException.of(null, "test"))
             .isInstanceOf(PumpException.class)
-            .hasMessage(null)
+            .hasMessage("null")
             .hasNoCause();
 
         assertThat(PumpException.of(null, (Object[]) null))
             .isInstanceOf(PumpException.class)
-            .hasMessage(null)
+            .hasMessage("null")
             .hasNoCause();
     }
 
@@ -77,7 +77,7 @@ public class PumpExceptionTest {
 
         assertThat(PumpException.of().withCause(null))
             .isInstanceOf(PumpException.class)
-            .hasMessage(null)
+            .hasMessage("null")
             .hasNoCause();
     }
 

@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import ru.iopump.qa.util.ClassUtil;
+import ru.iopump.qa.util.Str;
 
 /**
  * No constructors. Only static constructors and 'with' methods witch return copy of this 'PumpCoreException'.
@@ -55,6 +55,6 @@ public class PumpException extends QaException {
      */
     @NonNull
     public PumpException withCause(Throwable cause) {
-        return new PumpException(getMessage(), cause);
+        return new PumpException(getMessage() == null ? Str.toStr(cause) : getMessage(), cause);
     }
 }

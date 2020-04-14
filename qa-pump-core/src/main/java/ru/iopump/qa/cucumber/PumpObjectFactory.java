@@ -1,6 +1,6 @@
 package ru.iopump.qa.cucumber;
 
-import static ru.iopump.qa.cucumber.ContextImpl.INSTANCE;
+import static ru.iopump.qa.cucumber.SpringContextLoader.instance;
 
 import io.cucumber.core.backend.CucumberBackendException;
 import io.cucumber.core.backend.ObjectFactory;
@@ -28,6 +28,7 @@ public final class PumpObjectFactory implements ObjectFactory {
     private static Throwable failed;
 
     public PumpObjectFactory() {
+        System.out.println("[PUMP] PumpObjectFactory created from thread " + Thread.currentThread());
         loaded = true;
     }
 
@@ -36,7 +37,7 @@ public final class PumpObjectFactory implements ObjectFactory {
     public void start() {
         failCheck();
         try {
-            INSTANCE.startSpringContext();
+            instance().startSpringContext();
         } catch (Throwable contextCreatingException) {
             failed = contextCreatingException;
             if (contextCreatingException instanceof RuntimeException) {
@@ -54,19 +55,19 @@ public final class PumpObjectFactory implements ObjectFactory {
 
     @Override
     public void stop() {
-        INSTANCE.stopGlue();
+        instance().stopGlue();
     }
 
     @Override
     public boolean addClass(Class<?> glueClass) {
-        return INSTANCE.addClass(glueClass);
+        return instance().addClass(glueClass);
     }
 
     @Override
     public <T> T getInstance(Class<T> glueClass) {
         failCheck();
         try {
-            return INSTANCE.getInstance(glueClass);
+            return instance().getInstance(glueClass);
         } catch (CucumberBackendException beanCreatingException) {
             failed = beanCreatingException;
             throw beanCreatingException;
@@ -80,18 +81,19 @@ public final class PumpObjectFactory implements ObjectFactory {
         }
     }
 
+    //// STATIC ////
     /**
      * For internal using.
      * Unfreeze context between JUnit Pump Runner classes executions.
      * Use via reflection only.
      */
     private static void resetContextUnsafeInternal() {
+        System.out.println("[PUMP] PumpObjectFactory reset from thread " + Thread.currentThread());
         loaded = false;
         failed = null;
-        INSTANCE.resetUnsafeInternal();
+        SpringContextLoader.dispose();
     }
 
-    //// STATIC ////
     public static void checkObjectFactoryLoaded() {
         if (!loaded) {
             throw PumpException.of("Qa Pump Cucumber Object Loader is not loaded!\n" +
