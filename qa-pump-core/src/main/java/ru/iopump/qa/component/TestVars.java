@@ -3,37 +3,37 @@ package ru.iopump.qa.component;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Map;
-import ru.iopump.qa.component.context.Context;
+import ru.iopump.qa.component.vars.Vars;
 
-public interface TestContext extends Closeable {
+public interface TestVars extends Closeable {
 
     /**
      * Single scenario vars in single thread.
      *
      * @return Scenario context.
      */
-    Context scenarioContext();
+    Vars scenarioVars();
 
     /**
      * Feature vars in single thread.
      *
      * @return Feature context.
      */
-    Context featureContext();
+    Vars featureVars();
 
     /**
      * Static global vars and {@link java.util.function.Supplier}.
      *
      * @return Static global context.
      */
-    Context staticContext();
+    Vars staticVars();
 
     /**
      * Global vars between features
      *
      * @return Context on all feature.
      */
-    Context sharedContext();
+    Vars sharedVars();
 
     /**
      * Aggregate all variables and copy to immutable map.
@@ -44,9 +44,9 @@ public interface TestContext extends Closeable {
 
     @Override
     default void close() throws IOException {
-        scenarioContext().close();
-        featureContext().close();
-        staticContext().close();
-        sharedContext().close();
+        scenarioVars().close();
+        featureVars().close();
+        staticVars().close();
+        sharedVars().close();
     }
 }

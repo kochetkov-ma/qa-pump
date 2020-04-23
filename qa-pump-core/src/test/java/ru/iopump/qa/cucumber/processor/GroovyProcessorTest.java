@@ -10,19 +10,19 @@ import groovy.lang.MissingPropertyException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import ru.iopump.qa.component.TestContext;
+import ru.iopump.qa.component.TestVars;
 import ru.iopump.qa.component.groovy.GroovyScript;
 import ru.iopump.qa.exception.ProcessorException;
 
 public class GroovyProcessorTest {
 
     private GroovyProcessor processor;
-    private TestContext context;
+    private TestVars context;
     private GroovyScript script;
 
     @Before
     public void setUp() {
-        this.context = Mockito.mock(TestContext.class);
+        this.context = Mockito.mock(TestVars.class);
         Mockito.when(context.snapshot()).thenReturn(Maps.newHashMap());
         this.processor = new GroovyProcessor(context, false);
         this.script = GroovyScript.create();

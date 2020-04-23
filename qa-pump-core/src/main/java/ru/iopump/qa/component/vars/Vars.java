@@ -1,12 +1,11 @@
-package ru.iopump.qa.component.context;
+package ru.iopump.qa.component.vars;
 
 import java.io.Closeable;
-import java.util.Collection;
 import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 
-public interface Context extends Closeable {
+public interface Vars extends Closeable {
 
     Object put(@NonNull String varName, @Nullable Object value);
 
