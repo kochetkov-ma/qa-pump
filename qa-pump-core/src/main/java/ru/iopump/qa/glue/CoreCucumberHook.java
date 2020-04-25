@@ -4,18 +4,39 @@ import static ru.iopump.qa.util.Str.frm;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
+import java.util.Collection;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import ru.iopump.qa.component.vars.FeatureVars;
+import ru.iopump.qa.component.vars.ScenarioVars;
 import ru.iopump.qa.cucumber.event.ScenarioStart;
 import ru.iopump.qa.spring.scope.FeatureCodeScope;
 import ru.iopump.qa.spring.scope.FeatureSpec;
 import ru.iopump.qa.spring.scope.RunnerType;
 
+/**
+ * Internal Main Cucumber Hook.
+ * With Scenario Scope.
+ */
 @RequiredArgsConstructor
 public class CoreCucumberHook {
     public static final Thread INIT_THREAD = Thread.currentThread();
+
     private final ApplicationEventPublisher eventPublisher;
+    private final Collection<String> directBindings;
+    private final ScenarioVars scenarioVars;
+    private final FeatureVars featureVars;
+
+    @Before(value = "@StepVars", order = 0)
+    public void extractStepVars() {
+        directBindings.add(scenarioVars.bindName());
+    }
+
+    @Before(value = "@FeatureVars", order = 1)
+    public void extractFeatureVars() {
+        directBindings.add(featureVars.bindName());
+    }
 
     @Before(order = Integer.MIN_VALUE)
     public void mainBefore(Scenario cucumberScenario) {
@@ -29,6 +50,7 @@ public class CoreCucumberHook {
         /* Fire Spring event on Scenario start. Only after Feature handling above */
         eventPublisher.publishEvent(new ScenarioStart(cucumberScenario));
     }
+
 
     //// STATIC INTERNAL ////
 

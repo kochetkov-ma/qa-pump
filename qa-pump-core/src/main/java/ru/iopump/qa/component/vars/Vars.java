@@ -5,7 +5,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 
-public interface Vars extends Closeable {
+public interface Vars extends Closeable, Snapshotable {
 
     Object put(@NonNull String varName, @Nullable Object value);
 

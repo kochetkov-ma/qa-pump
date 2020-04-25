@@ -51,7 +51,8 @@ public class GroovyProcessor implements Processor<GroovyScript> {
         if (evaluator.getBindingMap() != null) {
             // add context to script and merge with exist
             evaluator = evaluator.withBindingMap(
-                ImmutableMap.<String, Object>builder().putAll(evaluator.getBindingMap()).putAll(processingContext.getBingMap()).build()
+                ImmutableMap.<String, Object>builder().putAll(evaluator.getBindingMap())
+                    .putAll(processingContext.getBingMap()).build()
             );
         } else {
             // add context to script

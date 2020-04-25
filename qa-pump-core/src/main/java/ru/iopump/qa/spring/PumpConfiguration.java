@@ -12,15 +12,18 @@ import static ru.iopump.qa.constants.PumpInternalConstants.COMPONENT_SCAN_PACKAG
 import static ru.iopump.qa.constants.PumpInternalConstants.COMPONENT_SCAN_PACKAGE_USER_DEFAULT;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.typesafe.config.Config;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -29,6 +32,7 @@ import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
@@ -102,6 +106,13 @@ public class PumpConfiguration
     }
 
     //// EXPLICIT BEANS
+
+    @Bean(name = "directBindings")
+    @Scope(PumpConstants.SCENARIO_SCOPE)
+    public List<String> directBindings(@Value("${pump.direct.binds}") List<String> staticDirectBindings) {
+        return staticDirectBindings == null ? Lists.newArrayList() : staticDirectBindings;
+    }
+
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();

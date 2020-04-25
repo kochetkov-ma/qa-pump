@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ public class StaticVars extends AbstractVars {
     private final Map<String, Object> staticVariableMap;
 
     @Override
+    @Value("${pump.bind.static}")
     public String bindName() {
         return "static";
     }

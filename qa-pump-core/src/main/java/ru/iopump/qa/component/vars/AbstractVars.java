@@ -1,5 +1,6 @@
 package ru.iopump.qa.component.vars;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,6 +56,13 @@ abstract class AbstractVars implements Vars, ProcessingBean {
             }
         });
         map.clear();
+    }
+
+    @Override
+    public Map<String, Object> snapshot() {
+        return ImmutableMap.<String, Object>builder()
+            .putAll(map)
+            .build();
     }
 
     @Override
