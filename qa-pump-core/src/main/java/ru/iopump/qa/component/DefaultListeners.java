@@ -9,11 +9,15 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import ru.iopump.qa.cucumber.event.FeatureFinish;
 import ru.iopump.qa.cucumber.event.FeatureStart;
 import ru.iopump.qa.cucumber.event.ScenarioStart;
 import ru.iopump.qa.cucumber.event.TestExecutionStart;
+import ru.iopump.qa.spring.scope.Execution;
 import ru.iopump.qa.spring.scope.FeatureCodeScope;
+import ru.iopump.qa.spring.scope.RunnerType;
 
+@SuppressWarnings("unused")
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -21,18 +25,20 @@ public class DefaultListeners {
 
     @EventListener
     public void onContextRefresh(ContextRefreshedEvent event) {
-        FeatureCodeScope.setApplicationEventPublisher(event.getApplicationContext());
+        FeatureCodeScope.setEventPublisher(event.getApplicationContext());
+        Execution.setEventPublisher(event.getApplicationContext());
     }
 
     @EventListener
-    public void onContextClosed(ContextClosedEvent event) {
-        if (FeatureCodeScope.isStarted()) {
-            FeatureCodeScope.getInstance().stop();
-            FeatureCodeScope.stopExecution();
+    public void onContextClosed(ContextClosedEvent mandatoryArg) {
+        if (Execution.isStarted()) {
+            FeatureCodeScope.getInstance().stop(); // Stop current instance in thread
+            FeatureCodeScope.stopScope(); // Stop static
+            Execution.assumedStop(); // Stop execution
         }
         System.out.println(frm(
             "INFO: Test execution has been finished at '{}'\n",
-            FeatureCodeScope.getLastFeature()
+            Execution.getLastFeature()
         ));
     }
 
@@ -46,6 +52,11 @@ public class DefaultListeners {
     @EventListener
     public void onFeatureStart(FeatureStart featureStart) {
         System.out.println(frm("INFO: Feature '{}' has been started now\n", featureStart.getFeature()));
+    }
+
+    @EventListener
+    public void onFeatureFinish(FeatureFinish featureFinish) {
+        System.out.println(frm("INFO: Feature '{}' has been finished now\n", featureFinish.getFeature()));
     }
 
     @EventListener

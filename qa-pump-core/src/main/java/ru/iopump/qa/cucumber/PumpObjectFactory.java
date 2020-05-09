@@ -12,6 +12,8 @@ import ru.iopump.qa.constants.PumpConfigKeys;
 import ru.iopump.qa.exception.EmptyException;
 import ru.iopump.qa.exception.PumpException;
 import ru.iopump.qa.spring.PumpConfiguration;
+import ru.iopump.qa.spring.scope.FeatureCodeScope;
+import ru.iopump.qa.spring.scope.RunnerType;
 import ru.iopump.qa.util.Str;
 import ru.iopump.qa.util.VarUtil;
 

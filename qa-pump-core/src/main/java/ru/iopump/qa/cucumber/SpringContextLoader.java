@@ -11,6 +11,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.NonNull;
 import ru.iopump.qa.exception.PumpException;
 import ru.iopump.qa.spring.PumpConfiguration;
+import ru.iopump.qa.spring.scope.Execution;
+import ru.iopump.qa.spring.scope.FeatureCodeScope;
+import ru.iopump.qa.spring.scope.RunnerType;
 import ru.iopump.qa.util.Str;
 
 class SpringContextLoader {
@@ -20,8 +23,22 @@ class SpringContextLoader {
     private final ObjectFactory delegate;
     private final CountDownLatch latch;
 
+    SpringContextLoader() {
+        latch = new CountDownLatch(1);
+        delegate = new SpringFactory();
+        delegate.addClass(pumpSpringConfigurationClass());
+    }
+
     static synchronized SpringContextLoader instance() {
         if (INSTANCE == null) {
+            // Only if runner is not set yet.
+            // Set runner as CUCUMBER_SINGLE_THREAD
+            // It means this execution run without any PumpRunners or other supported external runners.
+            // May be Main CLI or Cucumber runner is using now.
+            // Anyway this case allows only single thread execution.
+            if (Execution.setRunnerIfEmpty(RunnerType.CUCUMBER_SINGLE_THREAD)) {
+                FeatureCodeScope.initScope(); // Init execution and feature scope
+            }
             INSTANCE = new SpringContextLoader();
         }
         return INSTANCE;
@@ -32,37 +49,6 @@ class SpringContextLoader {
             INSTANCE.stopGlue();
         }
         INSTANCE = null;
-    }
-
-    SpringContextLoader() {
-        latch = new CountDownLatch(1);
-        delegate = new SpringFactory();
-        delegate.addClass(pumpSpringConfigurationClass());
-    }
-
-    void startSpringContext() throws InterruptedException {
-        if (init.compareAndSet(false, true)) { // freeze context
-            System.out.println("[PUMP] SpringContextLoader context is starting from thread " + Thread.currentThread());
-            delegate.start();
-            System.out.println("[PUMP] SpringContextLoader context has been started from thread " + Thread.currentThread());
-            latch.countDown(); // Open latch on ready context
-        } else {
-            latch.await(); // Wait for context starting
-            System.out.println("[PUMP] SpringContextLoader context has been already started from thread " + Thread.currentThread());
-        }
-    }
-
-    void stopGlue() {
-        delegate.stop();
-    }
-
-    boolean addClass(Class<?> glueClass) {
-        if (init.get()) return false; // context frozen
-        return delegate.addClass(glueClass);
-    }
-
-    <T> T getInstance(Class<T> glueClass) {
-        return delegate.getInstance(glueClass);
     }
 
     @NonNull
@@ -94,6 +80,33 @@ class SpringContextLoader {
                 .filter(classInfo -> !classInfo.isAbstract())
                 .loadClasses(abstractClass);
         }
+    }
+
+    void startSpringContext() throws InterruptedException {
+        if (init.compareAndSet(false, true)) { // freeze context
+            System.out.println("[PUMP] SpringContextLoader context is starting from thread " + Thread.currentThread());
+            delegate.start();
+            System.out.println("[PUMP] SpringContextLoader context has been started from thread " + Thread.currentThread());
+            latch.countDown(); // Open latch on ready context
+        } else {
+            latch.await(); // Wait for context starting
+            System.out.println("[PUMP] SpringContextLoader context has been already started from thread " + Thread.currentThread());
+        }
+    }
+
+    void stopGlue() {
+        delegate.stop();
+    }
+
+    boolean addClass(Class<?> glueClass) {
+        if (init.get()) {
+            return false; // context frozen
+        }
+        return delegate.addClass(glueClass);
+    }
+
+    <T> T getInstance(Class<T> glueClass) {
+        return delegate.getInstance(glueClass);
     }
 
     public static class DefaultPumpConfiguration extends PumpConfiguration {

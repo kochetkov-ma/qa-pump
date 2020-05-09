@@ -1,12 +1,15 @@
 package ru.iopump.qa.cucumber.processor;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.ToString;
@@ -28,10 +31,10 @@ public class ProcessingContext {
      * Without direct binds you should use scenarios vars like 'scenario.var_name'</br>
      * But with direct bind 'scenario' you should use scenarios vars like 'var_name'</br>
      *
-     * @param directBindings Directs binding collection with DESC ordering. Fist bind will override following
+     * @param directBindings Directs binding collection with DESC ordering. Fist bind will override following. First is most powerful.
      * @return Binding map.
      */
-    public Map<String, Object> getBingMap(@NonNull List<String> directBindings) {
+    public Map<String, Object> getBingMap(@Nullable List<String> directBindings) {
         // Calculate map from processing beans
         final Map<String, Object> bindMap = processingBeansProvider.getObject().stream().collect(Collectors.toMap(
             this::bind,
@@ -45,8 +48,7 @@ public class ProcessingContext {
 
         // If directBindings is not empty
         if (!CollectionUtils.isEmpty(directBindings)) {
-            //noinspection UnnecessaryLocalVariable
-            final List<String> tmp = directBindings; // Create tmp for reversing to avoid side effects
+            final List<String> tmp = Lists.newArrayList(directBindings); // Create tmp for reversing to avoid side effects
             Collections.reverse(tmp); // Reverse order for further foreach
             final Map<String, Object> newDirectBinds = Maps.newHashMap(); // Direct binds
             for (String directBind : tmp) {
@@ -71,9 +73,10 @@ public class ProcessingContext {
     }
 
     public Map<String, Object> getBingMap() {
-        return getBingMap(directBindings.getObject());
+        return getBingMap(Optional.ofNullable(directBindings).map(ObjectFactory::getObject).orElse(null));
     }
 
+//region Private methods
     @NonNull
     private String bind(@NonNull ProcessingBean bean) {
         if (bindPattern.matcher(bean.bindName()).matches()) {
@@ -82,4 +85,5 @@ public class ProcessingContext {
         throw ProcessorException.of("{} has wrong bind name '{}'. It must match the pattern '{}'",
             bean, bean.bindName(), bindPattern);
     }
+//endregion
 }

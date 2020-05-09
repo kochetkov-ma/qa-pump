@@ -18,34 +18,34 @@ abstract class AbstractVars implements Vars, ProcessingBean {
     @Override
     public Object put(@NonNull String varName, Object value) {
         log.info("[VARS][{}] Put {}:{}", getClass().getSimpleName(), varName, Str.toStr(value));
-        return map.put(varName, value);
+        return map().put(varName, value);
     }
 
     @Override
     public Object remove(@NonNull String varName) {
         log.debug("[VARS][{}] Remove var '{}'", getClass().getSimpleName(), varName);
-        return map.remove(varName);
+        return map().remove(varName);
     }
 
     @Override
     public Object get(@NonNull String varName) {
         log.debug("[VARS][{}] Get var '{}'", getClass().getSimpleName(), varName);
-        if (map.containsKey(varName)) {
-            return map.get(varName);
+        if (map().containsKey(varName)) {
+            return map().get(varName);
         }
         throw TestVarException.of("[{}] Var '{}' doesn't exist. All vars: {}",
-            getClass().getSimpleName(), varName, map.keySet()
+            getClass().getSimpleName(), varName, map().keySet()
         );
     }
 
     @Override
     public Map<String, Object> getAll() {
-        return Collections.unmodifiableMap(map);
+        return Collections.unmodifiableMap(map());
     }
 
     @Override
     public void close() {
-        map.forEach((key, value) -> {
+        map().forEach((key, value) -> {
             if (value instanceof AutoCloseable) {
                 try {
                     log.debug("[VARS][{}] Var '{}' is going to close", getClass().getSimpleName(), key);
@@ -55,18 +55,25 @@ abstract class AbstractVars implements Vars, ProcessingBean {
                 }
             }
         });
-        map.clear();
+        map().clear();
     }
 
     @Override
     public Map<String, Object> snapshot() {
         return ImmutableMap.<String, Object>builder()
-            .putAll(map)
+            .putAll(map())
             .build();
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(bindName=" + bindName() + ", map=" + map.keySet() + ')';
+        return getClass().getSimpleName() + "(bindName=" + bindName() + ", map=" + map().keySet() + ')';
+    }
+
+    /**
+     * Internal map (must be mutable).
+     */
+    protected Map<String, Object> map() {
+        return map;
     }
 }

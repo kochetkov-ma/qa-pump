@@ -14,6 +14,7 @@ import static ru.iopump.qa.constants.PumpInternalConstants.COMPONENT_SCAN_PACKAG
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.typesafe.config.Config;
+import io.cucumber.spring.PublicGlueCodeScope;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -44,6 +45,7 @@ import ru.iopump.qa.annotation.PumpApi;
 import ru.iopump.qa.constants.PumpConstants;
 import ru.iopump.qa.cucumber.PumpObjectFactory;
 import ru.iopump.qa.cucumber.processor.GroovyProcessor;
+import ru.iopump.qa.cucumber.processor.ProcessingContext;
 import ru.iopump.qa.cucumber.transformer.LastResortTransformer;
 import ru.iopump.qa.cucumber.transformer.ObjectTransformer;
 import ru.iopump.qa.cucumber.transformer.StringTransformer;
@@ -131,6 +133,8 @@ public class PumpConfiguration
         // ru.iopump.qa.cucumber.processor
         registry.registerBeanDefinition("groovyScriptProcessor",
             BeanDefinitionBuilder.rootBeanDefinition(GroovyProcessor.class).getBeanDefinition());
+        registry.registerBeanDefinition("processingContext",
+            BeanDefinitionBuilder.rootBeanDefinition(ProcessingContext.class).getBeanDefinition());
 
         // ru.iopump.qa.cucumber.type
         registry.registerBeanDefinition("typeResolver",
@@ -167,5 +171,6 @@ public class PumpConfiguration
     @Override
     public void postProcessBeanFactory(@Nonnull ConfigurableListableBeanFactory beanFactory) throws BeansException {
         beanFactory.registerScope(PumpConstants.FEATURE_SCOPE, new FeatureScope());
+        beanFactory.registerScope(PumpConstants.SCENARIO_SCOPE, new PublicGlueCodeScope());
     }
 }
