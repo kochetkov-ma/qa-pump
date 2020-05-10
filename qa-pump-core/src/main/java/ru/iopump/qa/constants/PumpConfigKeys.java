@@ -7,7 +7,7 @@ import io.cucumber.junit.PumpScenarioParallel;
 import org.springframework.core.env.AbstractEnvironment;
 import ru.iopump.qa.annotation.PumpApi;
 import ru.iopump.qa.annotation.PumpOptions;
-import ru.iopump.qa.cucumber.transformer.Transformer;
+import ru.iopump.qa.cucumber.transformer.api.Transformer;
 
 /**
  * Main configuration constants.

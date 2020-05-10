@@ -4,14 +4,14 @@ import javax.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import ru.iopump.qa.util.ClassUtil;
+import ru.iopump.qa.util.Str;
 
 /**
  * No constructors. Only static constructors and 'with' methods witch return copy of this 'PumpCoreException'.
  */
 @SuppressWarnings("unused")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProcessorException extends PumpException {
+public final class ProcessorException extends QaException {
 
     private static final long serialVersionUID = 1537248756540266353L;
 
@@ -42,13 +42,11 @@ public class ProcessorException extends PumpException {
         return new ProcessorException(formattedMessage, arguments);
     }
 
-    @Override
-    public @NonNull ProcessorException withMsg(@Nullable String formattedMessage, @Nullable Object... arguments) {
-        return (ProcessorException)super.withMsg(formattedMessage, arguments);
+    public final ProcessorException withMsg(@Nullable String formattedMessage, @Nullable Object... arguments) {
+        return new ProcessorException(formattedMessage, getCause(), arguments);
     }
 
-    @Override
-    public @NonNull ProcessorException withCause(Throwable cause) {
-        return (ProcessorException)super.withCause(cause);
+    public final ProcessorException withCause(Throwable cause) {
+        return new ProcessorException(getMessage() == null ? Str.toStr(cause) : getMessage(), cause);
     }
 }

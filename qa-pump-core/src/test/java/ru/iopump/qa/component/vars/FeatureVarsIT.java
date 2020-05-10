@@ -19,9 +19,9 @@ public class FeatureVarsIT {
         GroovyScript script = GroovyScript.create()
             .withBindingMap(ImmutableMap.of(featureVars.bindName(), featureVars));
 
-        assertThat(script.evaluate("feature.key1")).isEqualTo(1);
-        assertThat(script.evaluate("feature.null")).isEqualTo(null);
-        assertThatThrownBy(() -> script.evaluate("feature.not_exists")).isInstanceOf(TestVarException.class);
+        assertThat(script.evaluate("$feature.key1")).isEqualTo(1);
+        assertThat(script.evaluate("$feature.null")).isEqualTo(null);
+        assertThatThrownBy(() -> script.evaluate("$feature.not_exists")).isInstanceOf(TestVarException.class);
 
     }
 }

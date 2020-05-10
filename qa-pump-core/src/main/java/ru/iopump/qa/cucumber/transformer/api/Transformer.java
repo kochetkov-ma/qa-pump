@@ -1,4 +1,4 @@
-package ru.iopump.qa.cucumber.transformer;
+package ru.iopump.qa.cucumber.transformer.api;
 
 import java.lang.reflect.Type;
 import java.util.function.Supplier;
@@ -16,6 +16,8 @@ public interface Transformer<TARGET, HELPER, PROCESSOR extends Processor<HELPER>
     @NonNull
     Type targetType();
 
+    RelativeType relativeType();
+
     @Nullable
     Supplier<HELPER> helperSupplier();
 
@@ -23,7 +25,11 @@ public interface Transformer<TARGET, HELPER, PROCESSOR extends Processor<HELPER>
     Class<PROCESSOR> processorClass();
 
     @Nullable
-    TARGET transform(@NonNull ProcessResult gherkinArgumentAfterProcessing);
+    TARGET transform(@NonNull ProcessResult gherkinArgumentAfterProcessing, @NonNull Type toValueType);
 
     String toString();
+
+    enum RelativeType {
+        PARENT,CHILD
+    }
 }

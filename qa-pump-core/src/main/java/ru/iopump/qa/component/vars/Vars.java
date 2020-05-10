@@ -12,6 +12,4 @@ public interface Vars extends Closeable, Snapshotable {
     Object remove(@NonNull String varName);
 
     Object get(@NonNull String varName);
-
-    Map<String, Object> getAll();
 }

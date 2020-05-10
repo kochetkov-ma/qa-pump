@@ -10,9 +10,11 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class SharedVars extends AbstractVars {
+    @Value("${pump.bind.shared:#{null}}")
+    private String overriddenBind;
+
     @Override
-    @Value("${pump.bind.shared}")
     public String bindName() {
-        return "share";
+        return overriddenBind == null ? "share" : overriddenBind;
     }
 }

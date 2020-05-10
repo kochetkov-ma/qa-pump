@@ -10,9 +10,11 @@ import ru.iopump.qa.constants.PumpConstants;
 @Component
 @Scope(value = PumpConstants.FEATURE_SCOPE)
 public class FeatureVars extends AbstractVars {
+    @Value("${pump.bind.feature:#{null}}")
+    private String overriddenBind;
+
     @Override
-    @Value("${pump.bind.feature}")
     public String bindName() {
-        return "feature";
+        return overriddenBind == null ? "feature" : overriddenBind;
     }
 }

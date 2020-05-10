@@ -10,10 +10,11 @@ import ru.iopump.qa.constants.PumpConstants;
 @Component
 @Scope(value = PumpConstants.SCENARIO_SCOPE)
 public class ScenarioVars extends AbstractVars {
+    @Value("${pump.bind.scenario:#{null}}")
+    private String overriddenBind;
 
     @Override
-    @Value("${pump.bind.scenario}")
     public String bindName() {
-        return "scenario";
+        return overriddenBind == null ? "scenario" : overriddenBind;
     }
 }

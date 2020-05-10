@@ -4,13 +4,14 @@ import javax.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import ru.iopump.qa.util.Str;
 
 /**
  * No constructors. Only static constructors and 'with' methods witch return copy of this 'PumpCoreException'.
  */
 @SuppressWarnings("unused")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TestVarException extends PumpException {
+public final class TestVarException extends QaException {
 
     private static final long serialVersionUID = 1537248756540206353L;
 
@@ -41,13 +42,11 @@ public class TestVarException extends PumpException {
         return new TestVarException(formattedMessage, arguments);
     }
 
-    @Override
-    public @NonNull TestVarException withMsg(@Nullable String formattedMessage, @Nullable Object... arguments) {
-        return (TestVarException)super.withMsg(formattedMessage, arguments);
+    public final TestVarException withMsg(@Nullable String formattedMessage, @Nullable Object... arguments) {
+        return new TestVarException(formattedMessage, getCause(), arguments);
     }
 
-    @Override
-    public @NonNull TestVarException withCause(Throwable cause) {
-        return (TestVarException)super.withCause(cause);
+    public final TestVarException withCause(Throwable cause) {
+        return new TestVarException(getMessage() == null ? Str.toStr(cause) : getMessage(), cause);
     }
 }

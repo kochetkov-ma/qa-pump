@@ -1,11 +1,12 @@
 package ru.iopump.qa.component.vars;
 
-import com.google.common.collect.ImmutableMap;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import ru.iopump.qa.cucumber.processor.ProcessingBean;
 import ru.iopump.qa.exception.TestVarException;
 import ru.iopump.qa.util.Str;
@@ -14,6 +15,8 @@ import ru.iopump.qa.util.Str;
 abstract class AbstractVars implements Vars, ProcessingBean {
 
     private final Map<String, Object> map = Collections.synchronizedMap(new HashMap<>());
+    @Setter
+    private boolean errorIfNotExists = true;
 
     @Override
     public Object put(@NonNull String varName, Object value) {
@@ -33,14 +36,13 @@ abstract class AbstractVars implements Vars, ProcessingBean {
         if (map().containsKey(varName)) {
             return map().get(varName);
         }
-        throw TestVarException.of("[{}] Var '{}' doesn't exist. All vars: {}",
-            getClass().getSimpleName(), varName, map().keySet()
-        );
-    }
-
-    @Override
-    public Map<String, Object> getAll() {
-        return Collections.unmodifiableMap(map());
+        if (errorIfNotExists) {
+            throw TestVarException.of("[{}] Var '{}' doesn't exist. All vars: {}",
+                getClass().getSimpleName(), varName, map().keySet()
+            );
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -60,14 +62,12 @@ abstract class AbstractVars implements Vars, ProcessingBean {
 
     @Override
     public Map<String, Object> snapshot() {
-        return ImmutableMap.<String, Object>builder()
-            .putAll(map())
-            .build();
+        return Collections.unmodifiableMap(map());
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(bindName=" + bindName() + ", map=" + map().keySet() + ')';
+        return getClass().getSimpleName() + " " + bindName() + " " + Str.toPrettyString(map());
     }
 
     /**

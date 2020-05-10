@@ -46,6 +46,7 @@ import ru.iopump.qa.constants.PumpConstants;
 import ru.iopump.qa.cucumber.PumpObjectFactory;
 import ru.iopump.qa.cucumber.processor.GroovyProcessor;
 import ru.iopump.qa.cucumber.processor.ProcessingContext;
+import ru.iopump.qa.cucumber.transformer.EnumTransformer;
 import ru.iopump.qa.cucumber.transformer.LastResortTransformer;
 import ru.iopump.qa.cucumber.transformer.ObjectTransformer;
 import ru.iopump.qa.cucumber.transformer.StringTransformer;
@@ -123,6 +124,8 @@ public class PumpConfiguration
     @Override
     public void postProcessBeanDefinitionRegistry(@Nonnull BeanDefinitionRegistry registry) throws BeansException {
         // ru.iopump.qa.cucumber.transformer
+        registry.registerBeanDefinition("enumTransformer",
+            BeanDefinitionBuilder.rootBeanDefinition(EnumTransformer.class).getBeanDefinition());
         registry.registerBeanDefinition("objectTransformer",
             BeanDefinitionBuilder.rootBeanDefinition(ObjectTransformer.class).getBeanDefinition());
         registry.registerBeanDefinition("stringTransformer",

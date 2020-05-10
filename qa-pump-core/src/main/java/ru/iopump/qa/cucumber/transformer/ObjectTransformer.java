@@ -1,30 +1,18 @@
 package ru.iopump.qa.cucumber.transformer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.Type;
-import java.util.function.Supplier;
 import lombok.NonNull;
-import org.springframework.stereotype.Component;
-import ru.iopump.qa.component.groovy.GroovyScript;
-import ru.iopump.qa.cucumber.processor.ProcessResult;
-import ru.iopump.qa.exception.PumpException;
+import ru.iopump.qa.cucumber.transformer.api.GroovyObjectMapperTransformer;
 
-public final class ObjectTransformer extends AbstractGroovyTransformer<Object> {
+public final class ObjectTransformer extends GroovyObjectMapperTransformer<Object> {
+
+    public ObjectTransformer(@NonNull ObjectMapper objectMapper) {
+        super(objectMapper);
+    }
 
     @Override
     public Type targetType() {
         return Object.class;
-    }
-
-    @Override
-    public Supplier<GroovyScript> helperSupplier() {
-        return GroovyScript::create;
-    }
-
-    @Override
-    public Object transform(@NonNull ProcessResult gherkinAfterProcessing) {
-        return gherkinAfterProcessing.getResult().orElseThrow(() ->
-            PumpException.of("Object transformer error, because Object result is empty '{}'", gherkinAfterProcessing)
-                .withCause(gherkinAfterProcessing.getProcessException().orElse(null))
-        );
     }
 }

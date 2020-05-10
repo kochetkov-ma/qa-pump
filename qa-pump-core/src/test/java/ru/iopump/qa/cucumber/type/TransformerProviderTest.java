@@ -15,7 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import ru.iopump.qa.cucumber.processor.GroovyProcessor;
-import ru.iopump.qa.cucumber.transformer.Transformer;
+import ru.iopump.qa.cucumber.transformer.api.Transformer;
 
 public class TransformerProviderTest {
 
@@ -31,11 +31,12 @@ public class TransformerProviderTest {
 
     @Test
     public void getAll() {
-        assertThat(provider.getAll()).hasSize(11);
+        assertThat(provider.getAll()).hasSize(12);
     }
 
     @Test
     public void findByType() {
+        assertThat(provider.findByType(EnumTest.class)).hasSize(1);
         assertThat(provider.findByType(Map.class)).hasSize(6);
         assertThat(provider.findByType(new TypeReference<Map<Object, Object>>() {
         }.getType())).hasSize(3);
@@ -87,10 +88,19 @@ public class TransformerProviderTest {
 
     @Test
     public void instanceOf() {
+
         JavaType left = mapper.constructType(new TypeReference<HashMap<?, ?>>() {
         }.getType());
         JavaType right = mapper.constructType(new TypeReference<Map<Object, Object>>() {
         }.getType());
+        assertThat(provider.instanceOf(left, right)).isTrue();
+
+        left = mapper.constructType(Enum.class);
+        right = mapper.constructType(EnumTest.class);
+        assertThat(provider.instanceOf(left, right)).isFalse();
+
+        left = mapper.constructType(EnumTest.class);
+        right = mapper.constructType(Enum.class);
         assertThat(provider.instanceOf(left, right)).isTrue();
 
         left = mapper.constructType(new TypeReference<Map<?, ?>>() {
@@ -159,9 +169,10 @@ public class TransformerProviderTest {
         assertThat(provider.isSameParameters(left, right)).isTrue();
     }
 
-
+    //region Private methods
     private Collection<Transformer> transformerCollection() {
         return ImmutableList.<Transformer>builder()
+            .add(transformerReversed(0, Enum.class))
             .add(transformer(0, String.class))
             .add(transformer(0, Object.class))
             .add(transformer(8, Object.class))
@@ -182,13 +193,29 @@ public class TransformerProviderTest {
             .build();
     }
 
+    private Transformer transformerReversed(int priority, Type type) {
+        Transformer transformer = Mockito.mock(Transformer.class);
+        Mockito.when(transformer.targetType()).thenReturn(type);
+        Mockito.when(transformer.priority()).thenReturn(priority);
+        Mockito.when(transformer.processorClass()).thenReturn(GroovyProcessor.class);
+        Mockito.when(transformer.toString()).thenReturn(type.toString());
+        Mockito.when(transformer.relativeType()).thenReturn(Transformer.RelativeType.PARENT);
+        return transformer;
+    }
+
     private Transformer transformer(int priority, Type type) {
         Transformer transformer = Mockito.mock(Transformer.class);
         Mockito.when(transformer.targetType()).thenReturn(type);
         Mockito.when(transformer.priority()).thenReturn(priority);
         Mockito.when(transformer.processorClass()).thenReturn(GroovyProcessor.class);
         Mockito.when(transformer.toString()).thenReturn(type.toString());
+        Mockito.when(transformer.relativeType()).thenReturn(Transformer.RelativeType.CHILD);
         return transformer;
+    }
+//endregion
+
+    private enum EnumTest {
+        ONE
     }
 
 }

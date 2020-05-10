@@ -11,7 +11,7 @@ import ru.iopump.qa.util.Str;
  */
 @SuppressWarnings("unused")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PumpException extends QaException {
+public final class PumpException extends QaException {
 
     private static final long serialVersionUID = 2540707445608794577L;
 

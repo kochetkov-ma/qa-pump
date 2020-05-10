@@ -6,9 +6,18 @@ import ru.iopump.qa.annotation.PumpApi;
 
 @PumpApi
 public interface ProcessResult {
+
+    /**
+     * Source string from gherkin step.
+     *
+     * @return Source argument string from gherkin step.
+     */
+    @NonNull
+    String getSourceString();
+
     /**
      * Result after processing.
-     * Rule: If suppressed exception not exist - result MUST be exist,
+     * Rule: If suppressed exception not exist - result MUST be exist or NULL.
      *
      * @return Result of processing.
      */

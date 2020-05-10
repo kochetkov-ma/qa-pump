@@ -1,6 +1,5 @@
 package ru.iopump.qa.cucumber.processor;
 
-import static ru.iopump.qa.component.groovy.GroovyUtil.asGString;
 import static ru.iopump.qa.component.groovy.GroovyUtil.gStringContent;
 import static ru.iopump.qa.component.groovy.GroovyUtil.isGString;
 import static ru.iopump.qa.component.groovy.GroovyUtil.isString;
@@ -16,8 +15,9 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import ru.iopump.qa.component.groovy.EvaluatingMode;
 import ru.iopump.qa.component.groovy.GroovyScript;
-import ru.iopump.qa.cucumber.transformer.Transformer;
+import ru.iopump.qa.cucumber.transformer.api.Transformer;
 import ru.iopump.qa.exception.ProcessorException;
 import ru.iopump.qa.util.Str;
 
@@ -62,7 +62,7 @@ public class GroovyProcessor implements Processor<GroovyScript> {
         var resultBuilder = ProcessResultImpl.builder();
         Object result = rawGherkinArgument;
         try {
-            // Try evaluate as Groovy script
+            // Try evaluate Groovy script first time
             result = evaluator.evaluate(rawGherkinArgument);
             if (result instanceof GString) {
                 // Groovy String must be convert to Java String
@@ -78,7 +78,7 @@ public class GroovyProcessor implements Processor<GroovyScript> {
                         "\nYou should fix you step or try disable strictMode in configuration 'precessing.strict.mode=false'",
                     scriptException,
                     rawGherkinArgument
-                );
+                ).withCause(scriptException);
             }
             // GroovyRuntimeException considers as expected behavior
             log.debug("Groovy processing error script string '{}'\nwith exception '{}'",
@@ -97,7 +97,7 @@ public class GroovyProcessor implements Processor<GroovyScript> {
             // If it was Script -> try as GString
             if (!isString(rawGherkinArgument) && !isGString(rawGherkinArgument)) {
                 try {
-                    result = evaluator.evaluate(asGString(rawGherkinArgument));
+                    result = evaluator.withMode(EvaluatingMode.G_STRING).evaluate(rawGherkinArgument);
                 } catch (GroovyRuntimeException gException) {
                     resultBuilder.processException(gException);
                 }
@@ -106,7 +106,7 @@ public class GroovyProcessor implements Processor<GroovyScript> {
             // Another exceptions consider as user's mistake
             throw ProcessorException.of("Groovy processing error script string '{}' with logic exception",
                 throwingException,
-                rawGherkinArgument);
+                rawGherkinArgument).withCause(throwingException);
         }
 
         if (result == null) {
@@ -120,7 +120,7 @@ public class GroovyProcessor implements Processor<GroovyScript> {
         } else {
             resultBuilder.resultAsString(Str.toStr(result));
         }
-        var res = resultBuilder.build();
+        var res = resultBuilder.sourceString(rawGherkinArgument).build();
         log.debug("Processed success\nProcessor:{}\nSource:{}\nResult:{}", getClass().getName(), rawGherkinArgument, res);
         return res;
     }

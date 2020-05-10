@@ -4,6 +4,7 @@ import groovy.lang.GroovyRuntimeException;
 import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.ToString;
 
 @ToString
@@ -13,6 +14,8 @@ class ProcessResultImpl implements ProcessResult {
     @Getter
     String resultAsString;
     GroovyRuntimeException processException;
+    @Getter
+    String sourceString;
 
     @Override
     public Optional<Object> getResult() {
