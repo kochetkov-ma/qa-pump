@@ -1,6 +1,7 @@
 package ru.iopump.qa.cucumber;
 
 import io.cucumber.core.backend.ObjectFactory;
+import io.cucumber.spring.CucumberContextConfiguration;
 import io.cucumber.spring.SpringFactory;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
@@ -109,6 +110,7 @@ class SpringContextLoader {
         return delegate.getInstance(glueClass);
     }
 
+    @CucumberContextConfiguration
     public static class DefaultPumpConfiguration extends PumpConfiguration {
     }
 }

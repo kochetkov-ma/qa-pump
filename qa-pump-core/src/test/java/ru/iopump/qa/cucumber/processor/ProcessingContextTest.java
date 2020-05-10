@@ -46,13 +46,13 @@ public class ProcessingContextTest {
 
         // Results
         var objectMap = processingContext.getBingMap();
-        assertThat(objectMap).containsOnlyKeys("scenario", "feature", "share");
+        assertThat(objectMap).containsOnlyKeys("scenario", "feature", "shared");
 
         objectMap = processingContext.getBingMap(List.of("scenario", "feature"));
-        assertThat(objectMap).containsExactlyEntriesOf(ImmutableMap.<String,Object>builder()
+        assertThat(objectMap).containsAllEntriesOf(ImmutableMap.<String,Object>builder()
             .put("object_1", object_1)
             .put("string_2", "string_2 value")
-            .put("share", sharedVars)
+            .put("shared", sharedVars)
             .put("string_1", "string_1 value")
             .build()
         );
