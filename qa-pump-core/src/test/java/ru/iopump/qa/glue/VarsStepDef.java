@@ -49,9 +49,9 @@ public class VarsStepDef {
         }
     }
 
-    @Given("^evaluate and print argument (.+)$")
+    @Given("^evaluate and print (.+)$")
     public void contextLoad(Object argumentAfterTransforming) {
-        log.info("RESULT: {}", argumentAfterTransforming);
+        log.info("\nRESULT: {}\n", argumentAfterTransforming);
     }
 
     public enum VarType {

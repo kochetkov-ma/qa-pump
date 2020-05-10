@@ -15,6 +15,6 @@ public class SharedVars extends AbstractVars {
 
     @Override
     public String bindName() {
-        return overriddenBind == null ? "share" : overriddenBind;
+        return overriddenBind == null ? "shared" : overriddenBind;
     }
 }
