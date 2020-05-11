@@ -8,12 +8,12 @@ import ru.iopump.qa.annotation.PumpApi;
 
 @PumpApi
 public final class GroovyUtil {
-    public GroovyUtil() {
-        throw new AssertionError("utility class");
-    }
-
     public static final Pattern G_STRING = Pattern.compile("^(\"|\"\"\")(.*)(\"|\"\"\")$", Pattern.MULTILINE);
     public static final Pattern STRING = Pattern.compile("^('|''')(.*)('|''')$", Pattern.MULTILINE);
+
+    private GroovyUtil() {
+        throw new AssertionError("utility class");
+    }
 
     public static boolean isGString(@NonNull String candidate) {
         return G_STRING.matcher(candidate).matches();
@@ -42,24 +42,26 @@ public final class GroovyUtil {
     }
 
     public static String asGString(@NonNull String string) {
-        if (isGString(string)) {
-            return string;
+        String str = string;
+        if (isGString(str)) {
+            return str;
         }
-        if (isString(string)) {
-            string = stringContent(string);
+        if (isString(str)) {
+            str = stringContent(str);
         }
 
-        return "\"" + string + "\"";
+        return "\"" + str + "\"";
     }
 
     public static String asMultiLineGString(@NonNull String string) {
-        if (isGString(string)) {
-            return string;
+        String str = string;
+        if (isGString(str)) {
+            return str;
         }
-        if (isString(string)) {
-            string = stringContent(string);
+        if (isString(str)) {
+            str = stringContent(str);
         }
 
-        return "\"\"\"" + string + "\"\"\"";
+        return "\"\"\"" + str + "\"\"\"";
     }
 }

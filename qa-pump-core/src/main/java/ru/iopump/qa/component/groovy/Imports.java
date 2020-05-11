@@ -13,32 +13,32 @@ import ru.iopump.qa.annotation.PumpApi;
 @Value
 @Builder
 @PumpApi
-public class Imports {
+public class Imports { //NOPMD
     /**
      * For example: import java.util.Collection;<br>
      * java.util.Collection - Class
      */
     @Singular
-    Collection<Class<?>> simpleImports;
+    Collection<Class<?>> simpleImports; //NOPMD
     /**
      * For example: import java.util.*;<br>
      * java.util - package name
      */
     @Singular
-    Collection<String> starImports;
+    Collection<String> starImports; //NOPMD
     /**
      * For example: import static java.util.stream.Collectors.toSet<br>
      * java.util.stream.Collectors - Class<br>
      * toSet - method or field name
      */
     @Singular
-    Map<Class<?>, String> staticImports;
+    Map<Class<?>, String> staticImports; //NOPMD
     /**
      * For example: import static java.util.stream.Collectors.*<br>
      * java.util.stream.Collectors - Class
      */
     @Singular
-    Collection<Class<?>> staticStarImports;
+    Collection<Class<?>> staticStarImports; //NOPMD
 
     public String[] simpleImports() {
         return simpleImports.stream().map(Class::getName).toArray(String[]::new);

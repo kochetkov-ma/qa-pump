@@ -1,4 +1,4 @@
-package ru.iopump.qa.spring;
+package ru.iopump.qa.spring; //NOPMD
 
 import static org.springframework.core.env.StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME;
 import static org.springframework.core.env.StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME;
@@ -12,15 +12,18 @@ import static ru.iopump.qa.constants.PumpInternalConstants.COMPONENT_SCAN_PACKAG
 import static ru.iopump.qa.constants.PumpInternalConstants.COMPONENT_SCAN_PACKAGE_USER_DEFAULT;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.typesafe.config.Config;
+import io.cucumber.spring.PublicGlueCodeScope;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -29,6 +32,7 @@ import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
@@ -40,6 +44,8 @@ import ru.iopump.qa.annotation.PumpApi;
 import ru.iopump.qa.constants.PumpConstants;
 import ru.iopump.qa.cucumber.PumpObjectFactory;
 import ru.iopump.qa.cucumber.processor.GroovyProcessor;
+import ru.iopump.qa.cucumber.processor.ProcessingContext;
+import ru.iopump.qa.cucumber.transformer.EnumTransformer;
 import ru.iopump.qa.cucumber.transformer.LastResortTransformer;
 import ru.iopump.qa.cucumber.transformer.ObjectTransformer;
 import ru.iopump.qa.cucumber.transformer.StringTransformer;
@@ -59,7 +65,7 @@ import ru.iopump.qa.util.Str;
 @Slf4j
 @PumpApi("Main class. Spring configuration")
 @ContextConfiguration(classes = PumpConfiguration.class, initializers = PumpConfiguration.class)
-@ComponentScan( {
+@ComponentScan({
     COMPONENT_SCAN_PACKAGE_MAIN_DEFAULT,
     COMPONENT_SCAN_PACKAGE_EXTRA_DEFAULT,
     "${" + USER_COMPONENT_PACKAGE_KEY + ":" + COMPONENT_SCAN_PACKAGE_USER_DEFAULT + "}"
@@ -102,14 +108,23 @@ public class PumpConfiguration
     }
 
     //// EXPLICIT BEANS
+
+    @Bean(name = "directBindings")
+    @Scope(PumpConstants.SCENARIO_SCOPE)
+    public List<String> directBindings(@Value("${pump.direct.binds}") List<String> staticDirectBindings) {
+        return staticDirectBindings == null ? Lists.newArrayList() : staticDirectBindings;
+    }
+
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
     }
 
     @Override
-    public void postProcessBeanDefinitionRegistry(@Nonnull BeanDefinitionRegistry registry) throws BeansException {
+    public void postProcessBeanDefinitionRegistry(@Nonnull BeanDefinitionRegistry registry) {
         // ru.iopump.qa.cucumber.transformer
+        registry.registerBeanDefinition("enumTransformer",
+            BeanDefinitionBuilder.rootBeanDefinition(EnumTransformer.class).getBeanDefinition());
         registry.registerBeanDefinition("objectTransformer",
             BeanDefinitionBuilder.rootBeanDefinition(ObjectTransformer.class).getBeanDefinition());
         registry.registerBeanDefinition("stringTransformer",
@@ -120,6 +135,8 @@ public class PumpConfiguration
         // ru.iopump.qa.cucumber.processor
         registry.registerBeanDefinition("groovyScriptProcessor",
             BeanDefinitionBuilder.rootBeanDefinition(GroovyProcessor.class).getBeanDefinition());
+        registry.registerBeanDefinition("processingContext",
+            BeanDefinitionBuilder.rootBeanDefinition(ProcessingContext.class).getBeanDefinition());
 
         // ru.iopump.qa.cucumber.type
         registry.registerBeanDefinition("typeResolver",
@@ -128,6 +145,13 @@ public class PumpConfiguration
             BeanDefinitionBuilder.rootBeanDefinition(TransformerProvider.class).getBeanDefinition());
     }
 
+    @Override
+    public void postProcessBeanFactory(@Nonnull ConfigurableListableBeanFactory beanFactory) {
+        beanFactory.registerScope(PumpConstants.FEATURE_SCOPE, new FeatureScope());
+        beanFactory.registerScope(PumpConstants.SCENARIO_SCOPE, new PublicGlueCodeScope());
+    }
+
+    //region Private methods
     //// PRIVATE
     private static void printSystemEnvironment(@Nullable PropertySources propertySources) {
         if (propertySources == null) {
@@ -152,9 +176,5 @@ public class PumpConfiguration
         //noinspection rawtypes
         log.debug("[CONFIGURATION] Spring System Properties Config\n{}", Str.toPrettyString((Map) source.getSource()));
     }
-
-    @Override
-    public void postProcessBeanFactory(@Nonnull ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        beanFactory.registerScope(PumpConstants.FEATURE_SCOPE, new FeatureScope());
-    }
+//endregion
 }

@@ -1,53 +1,70 @@
 package ru.iopump.qa.cucumber.processor;
 
-import static ru.iopump.qa.component.groovy.GroovyUtil.asGString;
 import static ru.iopump.qa.component.groovy.GroovyUtil.gStringContent;
 import static ru.iopump.qa.component.groovy.GroovyUtil.isGString;
 import static ru.iopump.qa.component.groovy.GroovyUtil.isString;
 import static ru.iopump.qa.component.groovy.GroovyUtil.stringContent;
 import static ru.iopump.qa.constants.PumpConfigKeys.PROCESSOR_STRICT;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import groovy.lang.GString;
 import groovy.lang.GroovyRuntimeException;
 import javax.annotation.Nullable;
-import lombok.NonNull;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.iopump.qa.component.TestContext;
+import ru.iopump.qa.component.groovy.EvaluatingMode;
 import ru.iopump.qa.component.groovy.GroovyScript;
+import ru.iopump.qa.cucumber.transformer.api.Transformer;
 import ru.iopump.qa.exception.ProcessorException;
 import ru.iopump.qa.util.Str;
 
+@ToString
 @Slf4j
 @Component
 public class GroovyProcessor implements Processor<GroovyScript> {
-    private final TestContext context;
     private final boolean strictMode;
+    private final ProcessingContext processingContext;
 
-    public GroovyProcessor(TestContext context, @Value("${" + PROCESSOR_STRICT + ":false}") boolean strictMode) {
+    public GroovyProcessor(ProcessingContext processingContext,
+                           @Value("${" + PROCESSOR_STRICT + ":false}") boolean strictMode) {
 
+        this.processingContext = processingContext;
         this.strictMode = strictMode;
-        this.context = context;
     }
 
-    public ProcessResult process(@Nullable String rawGherkinArgument, @NonNull GroovyScript evaluator) {
-        if (evaluator.getBindingMap() != null) {
+    /**
+     * Evaluate argument as groovy script or groovy closure.
+     * Every {@link ProcessingBean} from Spring context adds to groovy script as bindings using {@link ProcessingBean#bindName()} as key.
+     * User may get access to these beans via their {@link ProcessingBean#bindName()} in groovy script in gherkin step.
+     *
+     * @param rawGherkinArgument Argument string from gherkin feature file (regexp group).
+     * @param groovyScript       {@link GroovyScript}. Cannot be null for this {@link Processor} implementation.
+     * @return Processing result. It's not final result. It's groovy script / closure evaluating result.
+     * The result will pass to {@link Transformer} further converting to SteDef's method argument type.
+     */
+    @Override
+    public ProcessResult process(@Nullable String rawGherkinArgument, GroovyScript groovyScript) { //NOPMD
+        Preconditions.checkNotNull(groovyScript, "GroovyScript cannot be null for this '%s' implementation", this);
+        GroovyScript gScript = groovyScript;
+        if (gScript.getBindingMap() != null) {
             // add context to script and merge with exist
-            evaluator = evaluator.withBindingMap(
-                ImmutableMap.<String, Object>builder().putAll(evaluator.getBindingMap()).putAll(context.snapshot()).build()
+            gScript = gScript.withBindingMap(
+                ImmutableMap.<String, Object>builder().putAll(gScript.getBindingMap())
+                    .putAll(processingContext.getBingMap()).build()
             );
         } else {
             // add context to script
-            evaluator = evaluator.withBindingMap(context.snapshot());
+            gScript = gScript.withBindingMap(processingContext.getBingMap());
         }
 
         var resultBuilder = ProcessResultImpl.builder();
         Object result = rawGherkinArgument;
         try {
-            // Try evaluate as Groovy script
-            result = evaluator.evaluate(rawGherkinArgument);
+            // Try evaluate Groovy script first time
+            result = gScript.evaluate(rawGherkinArgument);
             if (result instanceof GString) {
                 // Groovy String must be convert to Java String
                 resultBuilder.result(Str.toStr(result));
@@ -62,7 +79,7 @@ public class GroovyProcessor implements Processor<GroovyScript> {
                         "\nYou should fix you step or try disable strictMode in configuration 'precessing.strict.mode=false'",
                     scriptException,
                     rawGherkinArgument
-                );
+                ).withCause(scriptException);
             }
             // GroovyRuntimeException considers as expected behavior
             log.debug("Groovy processing error script string '{}'\nwith exception '{}'",
@@ -81,16 +98,16 @@ public class GroovyProcessor implements Processor<GroovyScript> {
             // If it was Script -> try as GString
             if (!isString(rawGherkinArgument) && !isGString(rawGherkinArgument)) {
                 try {
-                    result = evaluator.evaluate(asGString(rawGherkinArgument));
+                    result = gScript.withMode(EvaluatingMode.G_STRING).evaluate(rawGherkinArgument);
                 } catch (GroovyRuntimeException gException) {
                     resultBuilder.processException(gException);
                 }
             }
-        } catch (Exception throwingException) {
+        } catch (Exception throwingException) { //NOPMD
             // Another exceptions consider as user's mistake
             throw ProcessorException.of("Groovy processing error script string '{}' with logic exception",
                 throwingException,
-                rawGherkinArgument);
+                rawGherkinArgument).withCause(throwingException);
         }
 
         if (result == null) {
@@ -104,7 +121,7 @@ public class GroovyProcessor implements Processor<GroovyScript> {
         } else {
             resultBuilder.resultAsString(Str.toStr(result));
         }
-        var res = resultBuilder.build();
+        var res = resultBuilder.sourceString(rawGherkinArgument).build();
         log.debug("Processed success\nProcessor:{}\nSource:{}\nResult:{}", getClass().getName(), rawGherkinArgument, res);
         return res;
     }

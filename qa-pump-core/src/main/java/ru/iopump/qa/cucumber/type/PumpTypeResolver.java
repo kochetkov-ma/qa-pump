@@ -2,12 +2,12 @@ package ru.iopump.qa.cucumber.type;
 
 import static ru.iopump.qa.constants.PumpConfigKeys.TRANSFORMER_LAST_RESORT;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import ru.iopump.qa.annotation.PumpApi;
 import ru.iopump.qa.cucumber.processor.ProcessResult;
 import ru.iopump.qa.cucumber.processor.Processor;
-import ru.iopump.qa.cucumber.transformer.Transformer;
+import ru.iopump.qa.cucumber.transformer.api.Transformer;
 import ru.iopump.qa.exception.PumpException;
 import ru.iopump.qa.util.Str;
 
@@ -61,18 +61,8 @@ public class PumpTypeResolver {
 
         log.debug("Found transformer.\nSource: {}\nTarget type: {}\nTransformer: {}", rawValueFromGherkin, toValueType, transformer);
 
-        var om = beanFactory.getBean(ObjectMapper.class);
         //noinspection unchecked
-        Object object = resolve((String) rawValueFromGherkin, transformer);
-        try {
-            //noinspection unchecked
-            return (TARGET) om.convertValue(object, om.constructType(toValueType));
-        } catch (Exception e) {
-            throw PumpException.of(
-                "Transformation error. Check your transformer.\nSource: {}\nTarget type: {}\nTransformer: {}",
-                rawValueFromGherkin, toValueType, transformer
-            ).withCause(e);
-        }
+        return (TARGET) resolve((String) rawValueFromGherkin, transformer, toValueType);
     }
 
     /**
@@ -85,20 +75,23 @@ public class PumpTypeResolver {
      * @param <PROCESSOR>         Processor base type.
      * @return Converted and processed argument with expected type to step-def method.
      */
+    @SuppressWarnings("unused")
     public <TARGET, HELPER, PROCESSOR extends Processor<HELPER>> TARGET resolve(
         @NonNull String rawValueFromGherkin,
         @NonNull Class<? extends Transformer<TARGET, HELPER, PROCESSOR>> transformerClass) {
 
         // Get transformer from context
         final Transformer<TARGET, HELPER, PROCESSOR> transformer = beanFactory.getBean(transformerClass);
-        return resolve(rawValueFromGherkin, transformer);
+        return resolve(rawValueFromGherkin, transformer, transformer.targetType());
     }
 
     //// PRIVATE
 
+    //region Private methods
     private <TARGET, HELPER, PROCESSOR extends Processor<HELPER>> TARGET resolve(
         @NonNull String rawValueFromGherkin,
-        @NonNull Transformer<TARGET, HELPER, PROCESSOR> transformer) {
+        @NonNull Transformer<TARGET, HELPER, PROCESSOR> transformer,
+        @Nullable Type toValueType) {
 
         log.debug("Start transforming.\nSource:{}\nTransformer:{}", rawValueFromGherkin, transformer);
 
@@ -112,14 +105,17 @@ public class PumpTypeResolver {
         final ProcessResult processResult = processor.process(rawValueFromGherkin, helper);
 
         // Call final conversation form processing value to cucumber step-def method type.
-        TARGET result = transformer.transform(processResult);
-
-        log.debug("Finish transforming." +
-                "\nSource:{}" +
-                "\nTransformer:{}" +
-                "\nHelper:{}" +
-                "\nWith result:{}",
-            rawValueFromGherkin, transformer, Str.toStr(helper), Str.toStr(result));
+        TARGET result = transformer.transform(processResult, toValueType);
+        if (log.isDebugEnabled()) {
+            log.debug("Finish transforming." +
+                    "\nSource:{}" +
+                    "\nTransformer:{}" +
+                    "\nHelper:{}" +
+                    "\nWith result:{}" +
+                    "\nArgument type:{}",
+                rawValueFromGherkin, transformer, Str.toStr(helper), Str.toStr(result), toValueType);
+        }
         return result;
     }
+//endregion
 }

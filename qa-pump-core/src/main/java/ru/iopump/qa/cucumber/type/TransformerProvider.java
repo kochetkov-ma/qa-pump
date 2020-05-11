@@ -11,7 +11,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.iopump.qa.cucumber.transformer.LastResortTransformer;
-import ru.iopump.qa.cucumber.transformer.Transformer;
+import ru.iopump.qa.cucumber.transformer.api.Transformer;
 
 @SuppressWarnings("rawtypes")
 @Slf4j
@@ -28,7 +28,13 @@ public class TransformerProvider {
 
     public Collection<Transformer> findByType(@NonNull Type baseTargetType) {
         return getAll().stream()
-            .filter(t -> instanceOf(t.targetType(), baseTargetType))
+            .filter(t -> {
+                if (t.relativeType() == Transformer.RelativeType.CHILD) {
+                    return instanceOf(t.targetType(), baseTargetType);
+                } else {
+                    return instanceOf(baseTargetType, t.targetType());
+                }
+            })
             .collect(Collectors.toList());
     }
 

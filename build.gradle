@@ -6,10 +6,15 @@ plugins {
     id 'checkstyle'
 
     id 'com.github.ben-manes.versions' version '0.28.0'
-    id 'com.github.spotbugs' version '3.0.0'
-    id 'io.freefair.lombok' version '5.0.0-rc6'
+    id 'com.github.spotbugs' version '4.0.8'
+    id 'io.freefair.lombok' version '5.0.1'
     id 'com.github.kt3k.coveralls' version '2.10.1'
+
+    id 'io.codearte.nexus-staging' version '0.21.2' // Releasing
+    id 'signing'// Releasing
+    id 'maven' // Releasing
 }
+
 subprojects {
     apply plugin: 'java'
     apply plugin: 'jacoco'
@@ -20,22 +25,28 @@ subprojects {
     apply plugin: 'com.github.spotbugs'
     apply plugin: 'com.github.kt3k.coveralls'
 
+    // Releasing
+    apply plugin: 'maven'
+    apply plugin: 'signing'
+
+    apply from: "$rootDir/gradle/publishing.gradle"
     apply from: "$rootDir/gradle/dependencies.gradle"
     apply from: "$rootDir/gradle/checking.gradle"
     apply from: "$rootDir/gradle/setup.gradle"
     apply from: "$rootDir/gradle/testing.gradle"
 }
+archivesBaseName = theArchivesBaseName
+
 allprojects {
+    version = theVersion
+    group = theGroup
+
     repositories {
         mavenCentral()
     }
 
     generateLombokConfig.enabled = false
 }
-
-version = theVersion
-group = theGroup
-archivesBaseName = theArchivesBaseName
 
 compileJava {
     options.encoding = 'UTF-8'
@@ -52,7 +63,7 @@ idea {
 }
 wrapper {
     distributionType = Wrapper.DistributionType.ALL
-    gradleVersion = '6.2.2'
+    gradleVersion = '6.4'
 }
 clean {
     doLast {

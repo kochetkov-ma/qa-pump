@@ -13,6 +13,8 @@ class ProcessResultImpl implements ProcessResult {
     @Getter
     String resultAsString;
     GroovyRuntimeException processException;
+    @Getter
+    String sourceString;
 
     @Override
     public Optional<Object> getResult() {

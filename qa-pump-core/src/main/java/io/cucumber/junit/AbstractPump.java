@@ -16,6 +16,7 @@ import org.junit.runners.ParentRunner;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.RunnerScheduler;
 import ru.iopump.qa.cucumber.PumpObjectFactory;
+import ru.iopump.qa.spring.scope.Execution;
 import ru.iopump.qa.spring.scope.FeatureCodeScope;
 import ru.iopump.qa.spring.scope.FeatureSpec;
 import ru.iopump.qa.spring.scope.RunnerType;
@@ -27,9 +28,11 @@ abstract class AbstractPump<DELEGATE extends ParentRunner<ParentRunner<?>>> exte
 
     public AbstractPump(Class<?> testClass) throws InitializationError {
         super(testClass);
-        FeatureCodeScope.stopExecution(); // Reset Feature Context
+
+        Execution.setRunner(RunnerType.PUMP_JUNIT); // Add new Runner and start Test execution
+        FeatureCodeScope.initScope(); // Init new feature scope
         Reflect.onClass(PumpObjectFactory.class).call("resetContextUnsafeInternal").get(); // Reset Spring Factory
-        FeatureCodeScope.checkRunnerOrSet(null, RunnerType.PUMP_JUNIT); // Add new Runner and start Test execution
+
         cucumberDelegate = newCucumberDelegate(testClass);
     }
 
@@ -78,10 +81,14 @@ abstract class AbstractPump<DELEGATE extends ParentRunner<ParentRunner<?>>> exte
             @Override
             public void testSuiteStarted(Description description) {
                 if (description.getTestClass() != null) {
-                    log.info("[JUNIT] ROOT JUNIT RUNNER STARTED - " + description);
+                    if (log.isInfoEnabled()) {
+                        log.info("[JUNIT] ROOT JUNIT RUNNER STARTED - " + description);
+                    }
                 } else {
-                    FeatureSpec featureSpec = FeatureSpec.fromDescription(description);
-                    log.info("[JUNIT] {} {}", "testSuiteStarted", featureSpec);
+                    final FeatureSpec featureSpec = FeatureSpec.fromDescription(description);
+                    if (log.isInfoEnabled()) {
+                        log.info("[JUNIT] {} {}", "testSuiteStarted", featureSpec);
+                    }
                     FeatureCodeScope.getInstance().start(featureSpec);
                 }
             }
@@ -89,10 +96,18 @@ abstract class AbstractPump<DELEGATE extends ParentRunner<ParentRunner<?>>> exte
             @Override
             public void testSuiteFinished(Description description) {
                 if (description.getTestClass() != null) {
-                    log.info("[JUNIT] ROOT JUNIT RUNNER AND LAST FEATURE FINISHED - " + description);
-                    FeatureCodeScope.stopExecution();
+                    if (log.isInfoEnabled()) {
+                        log.info("[JUNIT] ROOT JUNIT RUNNER AND LAST FEATURE FINISHED - " + description);
+                    }
+
+                    FeatureCodeScope.stopScope();
+                    Execution.assumedStop();
+                    Execution.setRunner(null); // Reset current runner for other Junit runs
                 } else {
-                    log.info("[JUNIT] {} {}", "testSuiteFinished", FeatureCodeScope.getInstance().getActiveFeature());
+                    if (log.isInfoEnabled()) {
+                        log.info("[JUNIT] {} {}", "testSuiteFinished", FeatureCodeScope.getInstance().getActiveFeature());
+                    }
+
                     FeatureCodeScope.getInstance().stop();
                 }
             }

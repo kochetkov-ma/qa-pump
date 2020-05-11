@@ -16,6 +16,7 @@ public class Pump extends AbstractPump<Cucumber> {
         super(testClass);
     }
 
+    @Override
     protected Cucumber newCucumberDelegate(Class<?> testClass) throws InitializationError {
         return new Cucumber(testClass);
     }

@@ -2,25 +2,25 @@ ext {
     qaLibVersion = '1.1.0'
     junit4Version = '4.13'
     mockitoVersion = '3.3.3'
-    assertjVersion = '3.15.0'
+    assertjVersion = '3.16.1'
     slf4jVersion = '2.0.0-alpha1'
     logbackVersion = '1.3.0-alpha5'
-    commonsLangVersion = '3.9'
-    guavaVersion = '28.2-jre'
-    classgraphVersion = '4.8.65'
-    joorVersion = '0.9.12'
+    commonsLangVersion = '3.10'
+    guavaVersion = '29.0-jre'
+    classgraphVersion = '4.8.78'
+    joorVersion = '0.9.13'
 
-    cucumberVersion = '5.6.0'
-    springVersion = '5.2.4.RELEASE'
+    cucumberVersion = '6.0.0-RC2'
+    springVersion = '5.2.6.RELEASE'
     typesafeVersion = '1.4.0'
-    groovyVersion = '3.0.2'
-    jacksonVersion = '2.10.3'
+    groovyVersion = '3.0.3'
+    jacksonVersion = '2.11.0'
     javaxVersion = '1.3.2'
 }
 dependencies {
-    implementation "org.codehaus.groovy:groovy-all:$groovyVersion"
+    implementation("org.codehaus.groovy:groovy:$groovyVersion")
     /* QA lib */
-    implementation ("ru.iopump.qa:qa-tools:$qaLibVersion") { transitive false }
+    implementation("ru.iopump.qa:qa-tools:$qaLibVersion") { transitive false }
     /* Reflection lib */
     implementation "org.jooq:joor:$joorVersion"
     /* Classpath scanner */
@@ -28,10 +28,18 @@ dependencies {
     /* Apache commons */
     implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
     /* Guava */
-    implementation "com.google.guava:guava:$guavaVersion"
+    implementation ("com.google.guava:guava:$guavaVersion") {
+        exclude group: 'org.checkerframework'
+        exclude group: 'com.google.code.findbugs'
+        exclude group: 'com.google.errorprone'
+        exclude group: 'com.google.j2objc'
+    }
     /* Logging */
     implementation "org.slf4j:slf4j-api:$slf4jVersion"
-    runtimeOnly "ch.qos.logback:logback-classic:$logbackVersion"
+    runtimeOnly ("ch.qos.logback:logback-classic:$logbackVersion") {
+        exclude group: 'edu.washington.cs.types.checker'
+        exclude group: 'com.sun.mail'
+    }
     /* Testing */
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "org.assertj:assertj-core:$assertjVersion"

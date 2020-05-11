@@ -4,7 +4,7 @@ package ru.iopump.qa.exception;
  * Exception with no stacktrace.
  */
 @SuppressWarnings("unused")
-public class EmptyException extends PumpException {
+public class EmptyException extends QaException {
 
     private static final long serialVersionUID = 6943595892576399571L;
 
@@ -24,7 +24,7 @@ public class EmptyException extends PumpException {
     }
 
     @Override
-    public synchronized Throwable fillInStackTrace() {
+    public synchronized Throwable fillInStackTrace() { // NOPMD
         return this;
     }
 }

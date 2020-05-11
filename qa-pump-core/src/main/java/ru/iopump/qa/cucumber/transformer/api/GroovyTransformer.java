@@ -1,15 +1,14 @@
-package ru.iopump.qa.cucumber.transformer;
+package ru.iopump.qa.cucumber.transformer.api;
 
 import java.util.function.Supplier;
 import lombok.NonNull;
 import ru.iopump.qa.annotation.PumpApi;
 import ru.iopump.qa.component.groovy.GroovyScript;
 import ru.iopump.qa.cucumber.processor.GroovyProcessor;
-import ru.iopump.qa.cucumber.processor.ProcessResult;
 import ru.iopump.qa.util.Str;
 
 @PumpApi
-public abstract class AbstractGroovyTransformer<TARGET> implements Transformer<TARGET, GroovyScript, GroovyProcessor> {
+public abstract class GroovyTransformer<TARGET> implements Transformer<TARGET, GroovyScript, GroovyProcessor> {
 
     @Override
     public int priority() {
@@ -20,6 +19,11 @@ public abstract class AbstractGroovyTransformer<TARGET> implements Transformer<T
         return GroovyProcessor.class;
     }
 
+    @Override
+    public RelativeType relativeType() {
+        return RelativeType.CHILD;
+    }
+
     /**
      * Need documentation.
      *
@@ -27,15 +31,14 @@ public abstract class AbstractGroovyTransformer<TARGET> implements Transformer<T
      */
     @NonNull
     @Override
-    abstract public Supplier<GroovyScript> helperSupplier();
+    public Supplier<GroovyScript> helperSupplier() {
+        return GroovyScript::create;
+    }
 
     @Override
     public Class<GroovyProcessor> processorClass() {
         return GroovyProcessor.class;
     }
-
-    @Override
-    public abstract TARGET transform(@NonNull ProcessResult gherkinAfterProcessing);
 
     @Override
     public String toString() {
