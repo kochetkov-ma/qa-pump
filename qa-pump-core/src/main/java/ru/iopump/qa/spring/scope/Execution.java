@@ -91,11 +91,12 @@ public class Execution {
 
         if (!isUsingSupportedRunners) {
             throw new IllegalStateException(frm(
-                "You use unsupported Runner.\n" +
+                "You use unsupported Runner '{}'.\n" +
                     "Pump Framework support only two Cucumber Runners: {} and {}\n" +
                     "You should run your tests via @RunWith({}) or @RunWith({}} or @RunWith({}) with as JUnit tests.\n" +
                     "Also you can use Cucumber Main CLI with Pump Hook CoreCucumberHook.class " +
                     "- just add pkg 'ru.iopump.qa.glue' to your glue",
+                runner,
                 CUCUMBER_SINGLE_THREAD,
                 PUMP_JUNIT,
                 Pump.class.getName(),
