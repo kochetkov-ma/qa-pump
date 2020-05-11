@@ -31,7 +31,6 @@ abstract class AbstractPump<DELEGATE extends ParentRunner<ParentRunner<?>>> exte
 
         Execution.setRunner(RunnerType.PUMP_JUNIT); // Add new Runner and start Test execution
         FeatureCodeScope.initScope(); // Init new feature scope
-        Reflect.onClass(PumpObjectFactory.class).call("resetContextUnsafeInternal").get(); // Reset Spring Factory
 
         cucumberDelegate = newCucumberDelegate(testClass);
     }
@@ -103,6 +102,7 @@ abstract class AbstractPump<DELEGATE extends ParentRunner<ParentRunner<?>>> exte
                     FeatureCodeScope.stopScope();
                     Execution.assumedStop();
                     Execution.setRunner(null); // Reset current runner for other Junit runs
+                    Reflect.onClass(PumpObjectFactory.class).call("resetContextUnsafeInternal").get(); // Reset Spring Factory
                 } else {
                     if (log.isInfoEnabled()) {
                         log.info("[JUNIT] {} {}", "testSuiteFinished", FeatureCodeScope.getInstance().getActiveFeature());
