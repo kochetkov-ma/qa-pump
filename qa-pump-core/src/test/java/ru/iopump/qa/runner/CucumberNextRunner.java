@@ -1,4 +1,4 @@
-package ru.iopump.qa.runner.vars;
+package ru.iopump.qa.runner;
 
 import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;
@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
     monochrome = true,
     plugin = {"summary"},
     glue = {"ru.iopump.qa.glue"},
-    features = "classpath:features/vars"
+    features = "classpath:features/parallel/feature-parallel-1.feature"
 )
-public class VarsRunner {
+public class CucumberNextRunner {
 }

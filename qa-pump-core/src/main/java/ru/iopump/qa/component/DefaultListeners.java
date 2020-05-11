@@ -5,12 +5,10 @@ import static ru.iopump.qa.util.Str.frm;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.joor.Reflect;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import ru.iopump.qa.cucumber.PumpObjectFactory;
 import ru.iopump.qa.cucumber.event.FeatureFinish;
 import ru.iopump.qa.cucumber.event.FeatureStart;
 import ru.iopump.qa.cucumber.event.ScenarioStart;
@@ -32,14 +30,9 @@ public class DefaultListeners {
 
     @EventListener
     public void onContextClosed(ContextClosedEvent mandatoryArg) {
-        if (Execution.isStarted()) {
-            FeatureCodeScope.getInstance().stop(); // Stop current instance in thread
-            FeatureCodeScope.stopScope(); // Stop static
-            Execution.assumedStop(); // Stop execution
-            Reflect.onClass(PumpObjectFactory.class).call("resetContextUnsafeInternal").get();
-        }
         System.out.println(frm( //NOPMD
-            "INFO: Test execution has been finished at '{}'\n",
+            "INFO: Test execution '{}' has been finished at '{}'\n",
+            Thread.currentThread(),
             Execution.getLastFeature()
         ));
     }

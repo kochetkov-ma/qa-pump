@@ -13,9 +13,6 @@ import lombok.NonNull;
 import lombok.Synchronized;
 import ru.iopump.qa.exception.PumpException;
 import ru.iopump.qa.spring.PumpConfiguration;
-import ru.iopump.qa.spring.scope.Execution;
-import ru.iopump.qa.spring.scope.FeatureCodeScope;
-import ru.iopump.qa.spring.scope.RunnerType;
 import ru.iopump.qa.util.Str;
 
 class SpringContextLoader {
@@ -34,14 +31,6 @@ class SpringContextLoader {
     @Synchronized
     static SpringContextLoader instance() {
         if (INSTANCE == null) { //NOPMD
-            // Only if runner is not set yet.
-            // Set runner as CUCUMBER_SINGLE_THREAD
-            // It means this execution run without any PumpRunners or other supported external runners.
-            // May be Main CLI or Cucumber runner is using now.
-            // Anyway this case allows only single thread execution.
-            if (Execution.setRunnerIfEmpty(RunnerType.CUCUMBER_SINGLE_THREAD)) {
-                FeatureCodeScope.initScope(); // Init execution and feature scope
-            }
             INSTANCE = new SpringContextLoader();
         }
         return INSTANCE;

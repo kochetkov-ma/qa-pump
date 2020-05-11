@@ -37,7 +37,7 @@ public class FeatureCodeScope {
         Execution.checkRunner(); // Runner has already been sat
 
         final RunnerType activeRunner = Execution.getRunner();
-        if (activeRunner == RunnerType.PUMP_JUNIT) {
+        if (activeRunner == RunnerType.PUMP) {
             final ThreadLocal<FeatureCodeScope> context = ThreadLocal.withInitial(FeatureCodeScope::new);
             contextSupplier = context::get;
             contextRemove = context::remove;

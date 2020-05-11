@@ -1,7 +1,7 @@
 package ru.iopump.qa.spring.scope;
 
 import static ru.iopump.qa.spring.scope.RunnerType.CUCUMBER_SINGLE_THREAD;
-import static ru.iopump.qa.spring.scope.RunnerType.PUMP_JUNIT;
+import static ru.iopump.qa.spring.scope.RunnerType.PUMP;
 import static ru.iopump.qa.util.Str.frm;
 
 import io.cucumber.junit.Pump;
@@ -92,7 +92,7 @@ public class Execution {
 
     public static void checkRunner() {
         final RunnerType runner = RUNNER_TYPE;
-        final boolean isUsingSupportedRunners = (runner == CUCUMBER_SINGLE_THREAD || runner == PUMP_JUNIT);
+        final boolean isUsingSupportedRunners = (runner == CUCUMBER_SINGLE_THREAD || runner == PUMP);
 
         if (!isUsingSupportedRunners) {
             throw new IllegalStateException(frm(
@@ -103,7 +103,7 @@ public class Execution {
                     "- just add pkg 'ru.iopump.qa.glue' to your glue",
                 runner,
                 CUCUMBER_SINGLE_THREAD,
-                PUMP_JUNIT,
+                PUMP,
                 Pump.class.getName(),
                 PumpFeatureParallel.class.getName(),
                 PumpScenarioParallel.class.getName()
@@ -122,7 +122,7 @@ public class Execution {
                     "Also you can use Cucumber Main CLI with Pump Hook CoreCucumberHook.class " +
                     "- just add pkg 'ru.iopump.qa.glue' to your glue",
                 CUCUMBER_SINGLE_THREAD,
-                PUMP_JUNIT,
+                PUMP,
                 Pump.class.getName(),
                 PumpFeatureParallel.class.getName(),
                 PumpScenarioParallel.class.getName()

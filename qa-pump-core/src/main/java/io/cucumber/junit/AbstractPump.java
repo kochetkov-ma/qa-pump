@@ -29,13 +29,12 @@ abstract class AbstractPump<DELEGATE extends ParentRunner<ParentRunner<?>>> exte
     public AbstractPump(Class<?> testClass) throws InitializationError {
         super(testClass);
 
-        Execution.setRunner(RunnerType.PUMP_JUNIT); // Add new Runner and start Test execution
+        Execution.setRunner(RunnerType.PUMP); // Add new Runner and start Test execution
         FeatureCodeScope.initScope(); // Init new feature scope
+        Reflect.onClass(PumpObjectFactory.class).call("resetContextUnsafeInternal").get();
 
         cucumberDelegate = newCucumberDelegate(testClass);
     }
-
-    protected abstract DELEGATE newCucumberDelegate(Class<?> testClass) throws InitializationError;
 
     @Override
     public void setScheduler(RunnerScheduler scheduler) {
@@ -73,6 +72,8 @@ abstract class AbstractPump<DELEGATE extends ParentRunner<ParentRunner<?>>> exte
         cucumberDelegate.run(notifier);
     }
 
+    protected abstract DELEGATE newCucumberDelegate(Class<?> testClass) throws InitializationError;
+
     @NonNull
     protected RunListener listener() {
         return new RunListener() {
@@ -102,7 +103,8 @@ abstract class AbstractPump<DELEGATE extends ParentRunner<ParentRunner<?>>> exte
                     FeatureCodeScope.stopScope();
                     Execution.assumedStop();
                     Execution.setRunner(null); // Reset current runner for other Junit runs
-                    Reflect.onClass(PumpObjectFactory.class).call("resetContextUnsafeInternal").get(); // Reset Spring Factory
+                    // Prepare PumpObjectFactory for next Execution
+                    Reflect.onClass(PumpObjectFactory.class).call("resetContextUnsafeInternal").get();
                 } else {
                     if (log.isInfoEnabled()) {
                         log.info("[JUNIT] {} {}", "testSuiteFinished", FeatureCodeScope.getInstance().getActiveFeature());

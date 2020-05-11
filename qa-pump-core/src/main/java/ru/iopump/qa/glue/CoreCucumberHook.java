@@ -1,7 +1,5 @@
 package ru.iopump.qa.glue;
 
-import static ru.iopump.qa.util.Str.frm;
-
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import java.util.Collection;
@@ -20,7 +18,7 @@ import ru.iopump.qa.spring.scope.RunnerType;
  * With Scenario Scope.
  */
 public class CoreCucumberHook {
-    public static final Thread INIT_THREAD = Thread.currentThread(); //NOPMD
+
 
     private final ApplicationEventPublisher eventPublisher;
     private final Collection<String> directBindings;
@@ -53,7 +51,6 @@ public class CoreCucumberHook {
 
         /* Check Runner If no Pump.class junit runner then use CUCUMBER_SINGLE_THREAD and handle Feature Scope here */
         if (Execution.isRunner(RunnerType.CUCUMBER_SINGLE_THREAD)) {
-            checkSingleThread();
             singleThreadMainCliFeatureScopeHandler(cucumberScenario);
         }
         /* Additional check. Just in case */
@@ -77,19 +74,6 @@ public class CoreCucumberHook {
                 },
                 () -> FeatureCodeScope.getInstance().start(FeatureSpec.fromScenario(cucumberScenario))
             );
-    }
-
-    private static void checkSingleThread() {
-        if (INIT_THREAD != Thread.currentThread()) {
-            throw new IllegalStateException(frm(
-                "Probably you have run Cucumber test execution in multi-thread mode.\n" +
-                    "Pump Framework support this mode only via Pump JUnit runners PumpFeatureParallel.class or PumpScenarioParallel.class" +
-                    " or Pump.class sub-classes.\n" +
-                    "We assume it because your initial thread for this hook class is not equals current thread.\n" +
-                    "Please, use Pump JUnit Runners or disable multi-thread mode.\n" +
-                    "INIT_THREAD={} but Thread.currentThread={}", INIT_THREAD, Thread.currentThread()
-            ));
-        }
     }
 
     private static boolean isNewFeature(@NonNull FeatureSpec featureFromPrevScenario, @NonNull Scenario newScenario) {
