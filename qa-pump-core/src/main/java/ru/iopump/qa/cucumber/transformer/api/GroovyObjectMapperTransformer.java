@@ -24,6 +24,7 @@ public abstract class GroovyObjectMapperTransformer<TARGET> extends GroovyTransf
     }
 
     @Nullable
+    @Override
     public TARGET transform(@NonNull ProcessResult gherkinArgumentAfterProcessing, @NonNull Type toValueType) {
         final Optional<? extends RuntimeException> exception = gherkinArgumentAfterProcessing.getProcessException();
         final Optional<Object> fromObjectO = gherkinArgumentAfterProcessing.getResult();
@@ -57,7 +58,7 @@ public abstract class GroovyObjectMapperTransformer<TARGET> extends GroovyTransf
         try {
             //noinspection unchecked
             return (TARGET) getObjectMapper().convertValue(fromObject, getObjectMapper().constructType(toValueType));
-        } catch (Exception e) {
+        } catch (Exception e) { //NOPMD
             throw PumpException.of(
                 "Transformation error. Check your transformer.\nSource: {}\nTarget type: {}\nTransformer: {}",
                 rawStringForErrorMessage, toValueType, this

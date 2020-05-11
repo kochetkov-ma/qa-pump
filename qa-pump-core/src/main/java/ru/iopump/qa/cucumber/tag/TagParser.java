@@ -8,6 +8,7 @@ import io.cucumber.java.Scenario;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiPredicate;
@@ -22,7 +23,7 @@ import ru.iopump.qa.annotation.PumpApi;
 import ru.iopump.qa.util.StreamUtil;
 
 @PumpApi
-public class TagParser {
+public final class TagParser {
 
     private static final String DEFAULT_SEPARATOR = "=";
 
@@ -38,7 +39,7 @@ public class TagParser {
 
     public static TagParser of(@Nullable Collection<String> rawTags) {
         return new TagParser(StreamUtil.stream(rawTags)
-            .map(tag -> tag.startsWith("@") ? tag.substring(1) : tag)
+            .map(tag -> (tag.charAt(0) == '@') ? tag.substring(1) : tag)
             .collect(Collectors.toSet()));
     }
 
@@ -73,7 +74,7 @@ public class TagParser {
     public Optional<String> findComplexTagOneValue(@NonNull String key) {
         return findComplexTagValues(key)
             .map(result -> {
-                if (result.size() > 1) {
+                if (result.size() > 1) { //NOPMD
                     throw new IllegalArgumentException(format("We find several values %s for complex tag '%s'. Must be the only",
                         result, key));
                 }
@@ -91,14 +92,14 @@ public class TagParser {
     public Collection<String> findTags(@NonNull Collection<String> candidateTags,
                                        @NonNull BiPredicate<String, String> matcherCandidateVsActual) {
         return candidateTags.stream()
-            .flatMap(candidate -> findTags(tag -> matcherCandidateVsActual.test(candidate.toLowerCase(),
-                tag.toLowerCase())).stream())
+            .flatMap(candidate -> findTags(tag -> matcherCandidateVsActual.test(candidate.toLowerCase(Locale.getDefault()),
+                tag.toLowerCase(Locale.getDefault()))).stream())
             .collect(Collectors.toList());
     }
 
     @NonNull
     public Collection<String> findTags(@NonNull String tagKeyContains) {
-        return findTags(tag -> tag.toLowerCase().contains(tagKeyContains.toLowerCase()));
+        return findTags(tag -> tag.toLowerCase(Locale.getDefault()).contains(tagKeyContains.toLowerCase(Locale.getDefault())));
     }
 
     @NonNull
@@ -110,13 +111,14 @@ public class TagParser {
             ).orElse(tags);
     }
 
+    //region Private methods
     private Map<String, Collection<String>> getAllComplexTags() {
         final Pattern pattern = complexTagPattern();
         return tags.stream()
             .map(pattern::matcher)
             .filter(Matcher::matches)
             .collect(Collectors
-                .toMap(matcher -> matcher.group(1).toUpperCase(),
+                .toMap(matcher -> matcher.group(1).toUpperCase(Locale.getDefault()),
                     matcher -> Collections.singleton(matcher.group(2)),
                     (c1, c2) -> ImmutableSet.<String>builder().addAll(c1).addAll(c2).build()
                 ));
@@ -125,4 +127,5 @@ public class TagParser {
     private Pattern complexTagPattern() {
         return Pattern.compile("(.+?)" + complexTagSeparator + "(.+?)", Pattern.CASE_INSENSITIVE);
     }
+//endregion
 }

@@ -1,6 +1,7 @@
 package ru.iopump.qa.issue;
 
 import io.cucumber.java.en.Given;
+import io.cucumber.spring.CucumberContextConfiguration;
 import io.cucumber.spring.SpringFactory;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -8,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.test.context.ContextConfiguration;
-
 @Ignore
 public class Issue1970 {
 
@@ -19,6 +19,7 @@ public class Issue1970 {
         factory.start();
     }
 
+    @CucumberContextConfiguration
     @ContextConfiguration(classes = MySpringConfiguration.class)
     public static class GlueClass {
 

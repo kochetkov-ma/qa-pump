@@ -41,29 +41,30 @@ public class GroovyProcessor implements Processor<GroovyScript> {
      * User may get access to these beans via their {@link ProcessingBean#bindName()} in groovy script in gherkin step.
      *
      * @param rawGherkinArgument Argument string from gherkin feature file (regexp group).
-     * @param evaluator          {@link GroovyScript}. Cannot be null for this {@link Processor} implementation.
+     * @param groovyScript       {@link GroovyScript}. Cannot be null for this {@link Processor} implementation.
      * @return Processing result. It's not final result. It's groovy script / closure evaluating result.
      * The result will pass to {@link Transformer} further converting to SteDef's method argument type.
      */
-    public ProcessResult process(@Nullable String rawGherkinArgument, GroovyScript evaluator) {
-        Preconditions.checkNotNull(evaluator, "GroovyScript cannot be null for this '%s' implementation", this);
-
-        if (evaluator.getBindingMap() != null) {
+    @Override
+    public ProcessResult process(@Nullable String rawGherkinArgument, GroovyScript groovyScript) { //NOPMD
+        Preconditions.checkNotNull(groovyScript, "GroovyScript cannot be null for this '%s' implementation", this);
+        GroovyScript gScript = groovyScript;
+        if (gScript.getBindingMap() != null) {
             // add context to script and merge with exist
-            evaluator = evaluator.withBindingMap(
-                ImmutableMap.<String, Object>builder().putAll(evaluator.getBindingMap())
+            gScript = gScript.withBindingMap(
+                ImmutableMap.<String, Object>builder().putAll(gScript.getBindingMap())
                     .putAll(processingContext.getBingMap()).build()
             );
         } else {
             // add context to script
-            evaluator = evaluator.withBindingMap(processingContext.getBingMap());
+            gScript = gScript.withBindingMap(processingContext.getBingMap());
         }
 
         var resultBuilder = ProcessResultImpl.builder();
         Object result = rawGherkinArgument;
         try {
             // Try evaluate Groovy script first time
-            result = evaluator.evaluate(rawGherkinArgument);
+            result = gScript.evaluate(rawGherkinArgument);
             if (result instanceof GString) {
                 // Groovy String must be convert to Java String
                 resultBuilder.result(Str.toStr(result));
@@ -97,12 +98,12 @@ public class GroovyProcessor implements Processor<GroovyScript> {
             // If it was Script -> try as GString
             if (!isString(rawGherkinArgument) && !isGString(rawGherkinArgument)) {
                 try {
-                    result = evaluator.withMode(EvaluatingMode.G_STRING).evaluate(rawGherkinArgument);
+                    result = gScript.withMode(EvaluatingMode.G_STRING).evaluate(rawGherkinArgument);
                 } catch (GroovyRuntimeException gException) {
                     resultBuilder.processException(gException);
                 }
             }
-        } catch (Exception throwingException) {
+        } catch (Exception throwingException) { //NOPMD
             // Another exceptions consider as user's mistake
             throw ProcessorException.of("Groovy processing error script string '{}' with logic exception",
                 throwingException,

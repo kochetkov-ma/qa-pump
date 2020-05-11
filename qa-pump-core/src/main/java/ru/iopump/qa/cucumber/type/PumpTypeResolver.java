@@ -106,14 +106,15 @@ public class PumpTypeResolver {
 
         // Call final conversation form processing value to cucumber step-def method type.
         TARGET result = transformer.transform(processResult, toValueType);
-
-        log.debug("Finish transforming." +
-                "\nSource:{}" +
-                "\nTransformer:{}" +
-                "\nHelper:{}" +
-                "\nWith result:{}" +
-                "\nArgument type:{}",
-            rawValueFromGherkin, transformer, Str.toStr(helper), Str.toStr(result), toValueType);
+        if (log.isDebugEnabled()) {
+            log.debug("Finish transforming." +
+                    "\nSource:{}" +
+                    "\nTransformer:{}" +
+                    "\nHelper:{}" +
+                    "\nWith result:{}" +
+                    "\nArgument type:{}",
+                rawValueFromGherkin, transformer, Str.toStr(helper), Str.toStr(result), toValueType);
+        }
         return result;
     }
 //endregion

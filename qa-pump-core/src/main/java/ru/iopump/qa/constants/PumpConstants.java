@@ -8,26 +8,23 @@ import ru.iopump.qa.annotation.PumpApi;
 
 @PumpApi("Constants")
 public final class PumpConstants {
-    public PumpConstants() {
-        throw new AssertionError("utility class");
-    }
-
     /**
      * Default configuration folder in classpath resources.
      */
     public static final String CONF_DIR_DEFAULT = "/configuration";
-
     /**
      * Use as bean scope @Scope(PumpConstants.FEATURE_SCOPE).
      * Bean will life
      */
     public static final String FEATURE_SCOPE = SCOPE_PUMP_FEATURE;
-
     /**
      * Use as bean scope @Scope(PumpConstants.SCENARIO_SCOPE)
      */
     public static final String SCENARIO_SCOPE = SCOPE_CUCUMBER_GLUE;
 
+    private PumpConstants() {
+        throw new AssertionError("utility class");
+    }
 
     /**
      * Default configuration file name.
@@ -37,8 +34,8 @@ public final class PumpConstants {
      * Full name = Prefix + Main name + Extension -> 'pump-default.conf' when Spring Profile = 'default'.
      * Full default path will be '/configuration/pump-default.conf' in classpath resources.
      */
-    public static String getDefaultConfigName(String activeProfile) {
-        activeProfile = StringUtils.isBlank(activeProfile) ? "default" : activeProfile;
+    public static String getDefaultConfigName(String profile) {
+        String activeProfile = StringUtils.isBlank(profile) ? "default" : profile;
         return "pump-" + activeProfile + ".conf";
     }
 }

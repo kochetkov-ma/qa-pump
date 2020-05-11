@@ -46,7 +46,9 @@ public class FeatureVarsTest {
     public void close() {
         AtomicBoolean closed = new AtomicBoolean();
         featureVars.put("key1", (Closeable) () -> closed.set(true));
-        featureVars.put("key2", (Closeable) () -> {throw new RuntimeException();});
+        featureVars.put("key2", (Closeable) () -> {
+            throw new RuntimeException(); //NOPMD
+        });
         featureVars.close();
 
         assertThat(closed.get()).isTrue();

@@ -28,6 +28,7 @@ public final class PumpScenarioParallel extends PumpFeatureParallel {
         throw new NotImplementedException("This runner is not implemented yet. Work in progress. Use 'PumpFeatureParallel.class'");
     }
 
+    @Override
     protected void parseOptions(Class<?> testClass) {
         setThreadCount(VarUtil.get(SCENARIO_THREADS)
             .map(Integer::parseInt)

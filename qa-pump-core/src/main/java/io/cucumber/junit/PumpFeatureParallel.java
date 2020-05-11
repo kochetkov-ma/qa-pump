@@ -40,29 +40,34 @@ public class PumpFeatureParallel extends Pump {
             .or(() -> Optional.ofNullable(testClass.getAnnotation(PumpOptions.class)).map(PumpOptions::featureThreads))
             .orElse(FEATURE_THREADS_DEFAULT)
         );
+
     }
 
-    private static RunnerScheduler runnerScheduler(int threadCount, ThreadFactory factory) {
-        return new RunnerScheduler() {
-            private final ExecutorService executorService = Executors.newFixedThreadPool(threadCount, factory);
+//region Private methods
+private static RunnerScheduler runnerScheduler(int threadCount, ThreadFactory factory) {
+    return new RunnerScheduler() {
+        private final ExecutorService executorService = Executors.newFixedThreadPool(threadCount, factory); //NOPMD
 
-            public void schedule(Runnable childStatement) {
-                executorService.submit(childStatement);
-            }
+        @Override
+        public void schedule(Runnable childStatement) {
+            executorService.submit(childStatement); //NOPMD
+        }
 
-            public void finished() {
-                try {
-                    executorService.shutdown();
-                    executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    e.printStackTrace(System.err);
-                }
+        @Override
+        public void finished() {
+            try {
+                executorService.shutdown(); //NOPMD
+                executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS); //NOPMD
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                e.printStackTrace(System.err);
             }
-        };
-    }
+        }
+    };
+}
 
     private static ThreadFactory threadFactory() {
         return new ThreadFactoryBuilder().setNameFormat("feature-pool-%d").build();
     }
+//endregion
 }

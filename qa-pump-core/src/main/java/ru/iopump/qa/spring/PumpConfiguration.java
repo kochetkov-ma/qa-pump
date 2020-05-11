@@ -1,4 +1,4 @@
-package ru.iopump.qa.spring;
+package ru.iopump.qa.spring; //NOPMD
 
 import static org.springframework.core.env.StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME;
 import static org.springframework.core.env.StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME;
@@ -23,7 +23,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -66,7 +65,7 @@ import ru.iopump.qa.util.Str;
 @Slf4j
 @PumpApi("Main class. Spring configuration")
 @ContextConfiguration(classes = PumpConfiguration.class, initializers = PumpConfiguration.class)
-@ComponentScan( {
+@ComponentScan({
     COMPONENT_SCAN_PACKAGE_MAIN_DEFAULT,
     COMPONENT_SCAN_PACKAGE_EXTRA_DEFAULT,
     "${" + USER_COMPONENT_PACKAGE_KEY + ":" + COMPONENT_SCAN_PACKAGE_USER_DEFAULT + "}"
@@ -122,7 +121,7 @@ public class PumpConfiguration
     }
 
     @Override
-    public void postProcessBeanDefinitionRegistry(@Nonnull BeanDefinitionRegistry registry) throws BeansException {
+    public void postProcessBeanDefinitionRegistry(@Nonnull BeanDefinitionRegistry registry) {
         // ru.iopump.qa.cucumber.transformer
         registry.registerBeanDefinition("enumTransformer",
             BeanDefinitionBuilder.rootBeanDefinition(EnumTransformer.class).getBeanDefinition());
@@ -146,6 +145,13 @@ public class PumpConfiguration
             BeanDefinitionBuilder.rootBeanDefinition(TransformerProvider.class).getBeanDefinition());
     }
 
+    @Override
+    public void postProcessBeanFactory(@Nonnull ConfigurableListableBeanFactory beanFactory) {
+        beanFactory.registerScope(PumpConstants.FEATURE_SCOPE, new FeatureScope());
+        beanFactory.registerScope(PumpConstants.SCENARIO_SCOPE, new PublicGlueCodeScope());
+    }
+
+    //region Private methods
     //// PRIVATE
     private static void printSystemEnvironment(@Nullable PropertySources propertySources) {
         if (propertySources == null) {
@@ -170,10 +176,5 @@ public class PumpConfiguration
         //noinspection rawtypes
         log.debug("[CONFIGURATION] Spring System Properties Config\n{}", Str.toPrettyString((Map) source.getSource()));
     }
-
-    @Override
-    public void postProcessBeanFactory(@Nonnull ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        beanFactory.registerScope(PumpConstants.FEATURE_SCOPE, new FeatureScope());
-        beanFactory.registerScope(PumpConstants.SCENARIO_SCOPE, new PublicGlueCodeScope());
-    }
+//endregion
 }

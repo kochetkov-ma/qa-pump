@@ -6,7 +6,6 @@ import java.util.Map;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import ru.iopump.qa.cucumber.processor.ProcessingBean;
 import ru.iopump.qa.exception.TestVarException;
 import ru.iopump.qa.util.Str;
@@ -14,7 +13,7 @@ import ru.iopump.qa.util.Str;
 @Slf4j
 abstract class AbstractVars implements Vars, ProcessingBean {
 
-    private final Map<String, Object> map = Collections.synchronizedMap(new HashMap<>());
+    private final Map<String, Object> map = Collections.synchronizedMap(new HashMap<>()); //NOPMD
     @Setter
     private boolean errorIfNotExists = true;
 
@@ -52,7 +51,7 @@ abstract class AbstractVars implements Vars, ProcessingBean {
                 try {
                     log.debug("[VARS][{}] Var '{}' is going to close", getClass().getSimpleName(), key);
                     ((AutoCloseable) value).close();
-                } catch (Exception e) {
+                } catch (Exception e) { //NOPMD
                     log.error(Str.frm("[VARS][{}] Error closing '{}'", getClass().getSimpleName(), key), e);
                 }
             }

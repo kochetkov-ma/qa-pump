@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.Type;
 import javax.annotation.Nullable;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import ru.iopump.qa.cucumber.processor.ProcessResult;
 import ru.iopump.qa.cucumber.transformer.api.GroovyObjectMapperTransformer;
 

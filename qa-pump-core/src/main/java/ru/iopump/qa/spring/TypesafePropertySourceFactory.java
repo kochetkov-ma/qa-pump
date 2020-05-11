@@ -5,6 +5,7 @@ import static ru.iopump.qa.spring.PumpConfigUtils.prettyPrint;
 
 import com.typesafe.config.Config;
 import java.io.IOException;
+import javax.annotation.Nonnull;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -16,7 +17,8 @@ import org.springframework.core.io.support.PropertySourceFactory;
 final class TypesafePropertySourceFactory implements PropertySourceFactory {
 
     @Override
-    public PropertySource<Config> createPropertySource(String name, EncodedResource resource) throws IOException {
+    public PropertySource<Config> createPropertySource(String n, @Nonnull EncodedResource resource) throws IOException {
+        String name = n;
         if (StringUtils.isBlank(name)) {
             name = "typesafe";
         }

@@ -15,7 +15,6 @@ import ru.iopump.qa.cucumber.event.ScenarioStart;
 import ru.iopump.qa.cucumber.event.TestExecutionStart;
 import ru.iopump.qa.spring.scope.Execution;
 import ru.iopump.qa.spring.scope.FeatureCodeScope;
-import ru.iopump.qa.spring.scope.RunnerType;
 
 @SuppressWarnings("unused")
 @Component
@@ -36,7 +35,7 @@ public class DefaultListeners {
             FeatureCodeScope.stopScope(); // Stop static
             Execution.assumedStop(); // Stop execution
         }
-        System.out.println(frm(
+        System.out.println(frm( //NOPMD
             "INFO: Test execution has been finished at '{}'\n",
             Execution.getLastFeature()
         ));
@@ -44,24 +43,24 @@ public class DefaultListeners {
 
     @EventListener
     public void onTestStart(TestExecutionStart testExecutionStart) {
-        System.out.println(
+        System.out.println( //NOPMD
             frm("INFO: Test execution has been started from first feature: '{}'\n", testExecutionStart.getFirstFeature())
         );
     }
 
     @EventListener
     public void onFeatureStart(FeatureStart featureStart) {
-        System.out.println(frm("INFO: Feature '{}' has been started now\n", featureStart.getFeature()));
+        System.out.println(frm("INFO: Feature '{}' has been started now\n", featureStart.getFeature())); //NOPMD
     }
 
     @EventListener
     public void onFeatureFinish(FeatureFinish featureFinish) {
-        System.out.println(frm("INFO: Feature '{}' has been finished now\n", featureFinish.getFeature()));
+        System.out.println(frm("INFO: Feature '{}' has been finished now\n", featureFinish.getFeature())); //NOPMD
     }
 
     @EventListener
     public void onScenarioStart(ScenarioStart scenarioStart) {
-        System.out.println(
+        System.out.println( //NOPMD
             frm("INFO: Scenario '{} - {}' has been started now\n",
                 scenarioStart.getScenario().getId(),
                 scenarioStart.getScenario().getName()

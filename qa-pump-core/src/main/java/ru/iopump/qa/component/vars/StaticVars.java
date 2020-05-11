@@ -21,7 +21,7 @@ import ru.iopump.qa.util.StreamUtil;
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class StaticVars extends AbstractVars {
-    private final LazyMap map = new LazyMap();
+    private final LazyMap map = new LazyMap(); //NOPMD
     @Value("${pump.bind.static:#{null}}")
     private String overriddenBind;
 

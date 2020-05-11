@@ -27,6 +27,7 @@ public interface Transformer<TARGET, HELPER, PROCESSOR extends Processor<HELPER>
     @Nullable
     TARGET transform(@NonNull ProcessResult gherkinArgumentAfterProcessing, @NonNull Type toValueType);
 
+    @Override
     String toString();
 
     enum RelativeType {

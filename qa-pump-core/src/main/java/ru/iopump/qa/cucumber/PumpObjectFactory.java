@@ -12,8 +12,6 @@ import ru.iopump.qa.constants.PumpConfigKeys;
 import ru.iopump.qa.exception.EmptyException;
 import ru.iopump.qa.exception.PumpException;
 import ru.iopump.qa.spring.PumpConfiguration;
-import ru.iopump.qa.spring.scope.FeatureCodeScope;
-import ru.iopump.qa.spring.scope.RunnerType;
 import ru.iopump.qa.util.Str;
 import ru.iopump.qa.util.VarUtil;
 
@@ -30,8 +28,18 @@ public final class PumpObjectFactory implements ObjectFactory {
     private static Throwable failed;
 
     public PumpObjectFactory() {
-        System.out.println("[PUMP] PumpObjectFactory created from thread " + Thread.currentThread());
-        loaded = true;
+        System.out.println("[PUMP] PumpObjectFactory created from thread " + Thread.currentThread()); //NOPMD
+        loaded = true; //NOPMD
+    }
+
+    public static void checkObjectFactoryLoaded() {
+        if (!loaded) {
+            throw PumpException.of("Qa Pump Cucumber Object Loader is not loaded!\n" +
+                    "You must add '{}' via Cucumber options." +
+                    "\nInstructions:\n{}\n" +
+                    "Old way: JDK SPI (ServiceLoader) - see JavaDoc '{}'\n",
+                PumpObjectFactory.class, getInstruction(), ObjectFactory.class);
+        }
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -40,13 +48,13 @@ public final class PumpObjectFactory implements ObjectFactory {
         failCheck();
         try {
             instance().startSpringContext();
-        } catch (Throwable contextCreatingException) {
+        } catch (Throwable contextCreatingException) { //NOPMD
             failed = contextCreatingException;
-            if (contextCreatingException instanceof RuntimeException) {
+            if (contextCreatingException instanceof RuntimeException) { //NOPMD
                 throw (RuntimeException) contextCreatingException;
-            } else if (contextCreatingException instanceof Error) {
+            } else if (contextCreatingException instanceof Error) { //NOPMD
                 throw (Error) contextCreatingException;
-            } else if (contextCreatingException instanceof InterruptedException) {
+            } else if (contextCreatingException instanceof InterruptedException) { //NOPMD
                 Thread.currentThread().interrupt();
                 throw PumpException.of(contextCreatingException);
             } else {
@@ -76,34 +84,21 @@ public final class PumpObjectFactory implements ObjectFactory {
         }
     }
 
-    private void failCheck() {
-        if (failed != null && suppressFail) {
-            Thread.currentThread().interrupt();
-            throw new EmptyException("Context failed earlier on '{}'", failed.getClass().getSimpleName());
-        }
-    }
-
     //// STATIC ////
+
+//region Private methods
+
     /**
      * For internal using.
      * Unfreeze context between JUnit Pump Runner classes executions.
      * Use via reflection only.
      */
-    private static void resetContextUnsafeInternal() {
-        System.out.println("[PUMP] PumpObjectFactory reset from thread " + Thread.currentThread());
+    @SuppressWarnings("unused")
+    private static void resetContextUnsafeInternal() { //NOPMD
+        System.out.println("[PUMP] PumpObjectFactory reset from thread " + Thread.currentThread()); //NOPMD
         loaded = false;
-        failed = null;
+        failed = null; //NOPMD
         SpringContextLoader.dispose();
-    }
-
-    public static void checkObjectFactoryLoaded() {
-        if (!loaded) {
-            throw PumpException.of("Qa Pump Cucumber Object Loader is not loaded!\n" +
-                    "You must add '{}' via Cucumber options." +
-                    "\nInstructions:\n{}\n" +
-                    "Old way: JDK SPI (ServiceLoader) - see JavaDoc '{}'\n",
-                PumpObjectFactory.class, getInstruction(), ObjectFactory.class);
-        }
     }
 
     private static String getInstruction() {
@@ -116,4 +111,12 @@ public final class PumpObjectFactory implements ObjectFactory {
             PumpObjectFactory.class.getName(),
             Main.class);
     }
+
+    private void failCheck() {
+        if (failed != null && suppressFail) {
+            Thread.currentThread().interrupt();
+            throw new EmptyException("Context failed earlier on '{}'", failed.getClass().getSimpleName());
+        }
+    }
+//endregion
 }

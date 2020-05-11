@@ -20,14 +20,16 @@ public class FeatureCodeScope {
     private static Supplier<FeatureCodeScope> contextSupplier;
     private static Runnable contextRemove;
 
-    private final Map<String, Object> objects = new HashMap<>();
-    private final Map<String, Runnable> callbacks = new HashMap<>();
+    private final Map<String, Object> objects = new HashMap<>(); //NOPMD
+    private final Map<String, Runnable> callbacks = new HashMap<>(); //NOPMD
 
     private FeatureSpec activeFeature;
     private int counter;
 
     public FeatureCodeScope() {
-        log.debug("FeatureCodeScope created with thread " + Thread.currentThread());
+        if (log.isDebugEnabled()) {
+            log.debug("FeatureCodeScope created with thread " + Thread.currentThread());
+        }
     }
 
     //// STATIC ////
@@ -55,8 +57,8 @@ public class FeatureCodeScope {
     }
 
     public static void stopScope() {
-        contextSupplier = null;
-        contextRemove = null;
+        contextSupplier = null; //NOPMD
+        contextRemove = null; //NOPMD
     }
 
     public static void setEventPublisher(@NonNull ApplicationEventPublisher eventPublisher) {
@@ -106,10 +108,9 @@ public class FeatureCodeScope {
         callbacks.put(name, callback);
     }
 
-
     //region Private methods
     private void cleanUp() {
-        activeFeature = null;
+        activeFeature = null; //NOPMD
 
         callbacks.clear();
         contextRemove.run();
@@ -117,14 +118,18 @@ public class FeatureCodeScope {
             if (value instanceof DisposableBean) {
                 try {
                     ((DisposableBean) value).destroy();
-                } catch (Exception e) {
-                    log.error("FeatureContext DisposableBean bean destroy error: " + value, e);
+                } catch (Exception e) { //NOPMD
+                    if (log.isErrorEnabled()) {
+                        log.error("FeatureContext DisposableBean bean destroy error: " + value, e);
+                    }
                 }
             } else if (value instanceof AutoCloseable) {
                 try {
                     ((AutoCloseable) value).close();
-                } catch (Exception e) {
-                    log.error("FeatureScope AutoCloseable bean destroy error: " + value, e);
+                } catch (Exception e) { //NOPMD
+                    if (log.isErrorEnabled()) {
+                        log.error("FeatureScope AutoCloseable bean destroy error: " + value, e);
+                    }
                 }
             }
         });

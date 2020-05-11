@@ -12,7 +12,7 @@ import ru.iopump.qa.util.Str;
 
 
 final class PumpConfigUtils {
-    public PumpConfigUtils() {
+    private PumpConfigUtils() {
         throw new AssertionError("utility class");
     }
 

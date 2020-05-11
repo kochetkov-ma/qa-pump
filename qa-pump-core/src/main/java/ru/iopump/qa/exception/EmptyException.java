@@ -24,7 +24,7 @@ public class EmptyException extends QaException {
     }
 
     @Override
-    public synchronized Throwable fillInStackTrace() {
+    public synchronized Throwable fillInStackTrace() { // NOPMD
         return this;
     }
 }

@@ -81,10 +81,14 @@ abstract class AbstractPump<DELEGATE extends ParentRunner<ParentRunner<?>>> exte
             @Override
             public void testSuiteStarted(Description description) {
                 if (description.getTestClass() != null) {
-                    log.info("[JUNIT] ROOT JUNIT RUNNER STARTED - " + description);
+                    if (log.isInfoEnabled()) {
+                        log.info("[JUNIT] ROOT JUNIT RUNNER STARTED - " + description);
+                    }
                 } else {
                     final FeatureSpec featureSpec = FeatureSpec.fromDescription(description);
-                    log.info("[JUNIT] {} {}", "testSuiteStarted", featureSpec);
+                    if (log.isInfoEnabled()) {
+                        log.info("[JUNIT] {} {}", "testSuiteStarted", featureSpec);
+                    }
                     FeatureCodeScope.getInstance().start(featureSpec);
                 }
             }
@@ -92,13 +96,17 @@ abstract class AbstractPump<DELEGATE extends ParentRunner<ParentRunner<?>>> exte
             @Override
             public void testSuiteFinished(Description description) {
                 if (description.getTestClass() != null) {
-                    log.info("[JUNIT] ROOT JUNIT RUNNER AND LAST FEATURE FINISHED - " + description);
+                    if (log.isInfoEnabled()) {
+                        log.info("[JUNIT] ROOT JUNIT RUNNER AND LAST FEATURE FINISHED - " + description);
+                    }
 
                     FeatureCodeScope.stopScope();
                     Execution.assumedStop();
                     Execution.setRunner(null); // Reset current runner for other Junit runs
                 } else {
-                    log.info("[JUNIT] {} {}", "testSuiteFinished", FeatureCodeScope.getInstance().getActiveFeature());
+                    if (log.isInfoEnabled()) {
+                        log.info("[JUNIT] {} {}", "testSuiteFinished", FeatureCodeScope.getInstance().getActiveFeature());
+                    }
 
                     FeatureCodeScope.getInstance().stop();
                 }

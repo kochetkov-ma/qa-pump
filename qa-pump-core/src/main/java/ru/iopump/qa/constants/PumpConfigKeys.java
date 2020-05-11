@@ -14,7 +14,7 @@ import ru.iopump.qa.cucumber.transformer.api.Transformer;
  */
 @PumpApi("Configuration's keys")
 public final class PumpConfigKeys {
-    public PumpConfigKeys() {
+    private PumpConfigKeys() {
         throw new AssertionError("utility class");
     }
 

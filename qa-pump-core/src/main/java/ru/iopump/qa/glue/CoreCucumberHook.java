@@ -20,7 +20,7 @@ import ru.iopump.qa.spring.scope.RunnerType;
  * With Scenario Scope.
  */
 public class CoreCucumberHook {
-    public static final Thread INIT_THREAD = Thread.currentThread();
+    public static final Thread INIT_THREAD = Thread.currentThread(); //NOPMD
 
     private final ApplicationEventPublisher eventPublisher;
     private final Collection<String> directBindings;

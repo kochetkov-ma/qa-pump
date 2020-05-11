@@ -3,11 +3,11 @@ package ru.iopump.qa.component.vars.predefined;
 import com.google.common.collect.ImmutableSet;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Random;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -73,8 +73,8 @@ public class BuiltInStaticVars {
         return ImmutableSet.<StaticSupplier>builder()
             .add(newSupplier("now", LocalDateTime::now))
             .add(newSupplier("timestamp", () -> LocalDateTime.now().getNano()))
-            .add(newSupplier("rnd_int", () -> new Random().nextInt()))
-            .add(newSupplier("rnd_long", () -> new Random().nextLong()))
+            .add(newSupplier("rnd_int", RandomUtils::nextInt))
+            .add(newSupplier("rnd_long", RandomUtils::nextLong))
             .add(newSupplier("rnd_char", () -> RandomStringUtils.random(1)))
             .build();
     }

@@ -11,17 +11,20 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nullable;
 import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 import org.springframework.context.ApplicationEventPublisher;
 import ru.iopump.qa.cucumber.event.TestExecutionStart;
 
-public final class Execution {
+@SuppressWarnings("RedundantModifiersUtilityClassLombok")
+@UtilityClass
+public class Execution {
     private static final AtomicBoolean STARTED = new AtomicBoolean(false);
     private static final PostponeApplicationEventPublisher eventPublisher = new PostponeApplicationEventPublisher();
 
     private static RunnerType RUNNER_TYPE;
 
-    private static volatile FeatureSpec firstFeature;
-    private static volatile FeatureSpec lastFeature;
+    private static volatile FeatureSpec firstFeature; //NOPMD
+    private static volatile FeatureSpec lastFeature; //NOPMD
 
     public static void setEventPublisher(@NonNull ApplicationEventPublisher eventPublisher) {
         Execution.eventPublisher.redirectTo(eventPublisher);

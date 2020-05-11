@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.NonNull;
+import lombok.Synchronized;
 import ru.iopump.qa.exception.PumpException;
 import ru.iopump.qa.spring.PumpConfiguration;
 import ru.iopump.qa.spring.scope.Execution;
@@ -18,7 +19,7 @@ import ru.iopump.qa.spring.scope.RunnerType;
 import ru.iopump.qa.util.Str;
 
 class SpringContextLoader {
-    private static SpringContextLoader INSTANCE;
+    private static SpringContextLoader INSTANCE;//NOPMD
 
     private final AtomicBoolean init = new AtomicBoolean();
     private final ObjectFactory delegate;
@@ -30,8 +31,9 @@ class SpringContextLoader {
         delegate.addClass(pumpSpringConfigurationClass());
     }
 
-    static synchronized SpringContextLoader instance() {
-        if (INSTANCE == null) {
+    @Synchronized
+    static SpringContextLoader instance() {
+        if (INSTANCE == null) { //NOPMD
             // Only if runner is not set yet.
             // Set runner as CUCUMBER_SINGLE_THREAD
             // It means this execution run without any PumpRunners or other supported external runners.
@@ -45,29 +47,30 @@ class SpringContextLoader {
         return INSTANCE;
     }
 
-    static synchronized void dispose() {
+    @Synchronized
+    static void dispose() {
         if (INSTANCE != null) {
             INSTANCE.stopGlue();
         }
-        INSTANCE = null;
+        INSTANCE = null; //NOPMD
     }
 
     @NonNull
     static Class<? extends PumpConfiguration> pumpSpringConfigurationClass() {
         Collection<Class<PumpConfiguration>> cfgClasses = findImplementations(PumpConfiguration.class);
         if (cfgClasses.isEmpty()) {
-            System.out.println("\nThere are no USER classes extended " + PumpConfiguration.class +
-                ". Loaded DEFAULT QA Pump configuration: " + DefaultPumpConfiguration.class + "\n");
+            System.out.println("\nThere are no USER classes extended " + PumpConfiguration.class + //NOPMD
+                ". Loaded DEFAULT QA Pump configuration: " + DefaultPumpConfiguration.class + System.lineSeparator());
             return DefaultPumpConfiguration.class;
         }
-        if (cfgClasses.size() > 1) {
+        if (cfgClasses.size() > 1) { //NOPMD
             throw PumpException.of("Several QA Pump configuration classes found. " +
                     "Keep the only in classpath, please:\n{}",
                 Str.toPrettyString(cfgClasses)
             );
         }
         var cfg = cfgClasses.iterator().next();
-        System.out.println("\n[PUMP] Using USER Qa Pump configuration: " + cfg + "\n");
+        System.out.println("\n[PUMP] Using USER Qa Pump configuration: " + cfg + "\n"); //NOPMD
         return cfgClasses.iterator().next();
     }
 
@@ -85,13 +88,13 @@ class SpringContextLoader {
 
     void startSpringContext() throws InterruptedException {
         if (init.compareAndSet(false, true)) { // freeze context
-            System.out.println("[PUMP] SpringContextLoader context is starting from thread " + Thread.currentThread());
+            System.out.println("[PUMP] SpringContextLoader context is starting from thread " + Thread.currentThread()); //NOPMD
             delegate.start();
-            System.out.println("[PUMP] SpringContextLoader context has been started from thread " + Thread.currentThread());
+            System.out.println("[PUMP] SpringContextLoader context has been started from thread " + Thread.currentThread()); //NOPMD
             latch.countDown(); // Open latch on ready context
         } else {
             latch.await(); // Wait for context starting
-            System.out.println("[PUMP] SpringContextLoader context has been already started from thread " + Thread.currentThread());
+            System.out.println("[PUMP] SpringContextLoader context has been already started from thread " + Thread.currentThread()); //NOPMD
         }
     }
 

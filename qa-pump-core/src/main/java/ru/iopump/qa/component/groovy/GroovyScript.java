@@ -60,10 +60,11 @@ public class GroovyScript implements GroovyEvaluator {
     }
 
     @Override
-    public Object evaluate(@NonNull String groovyScript) {
+    public Object evaluate(@NonNull String groovyScript) { //NOPMD
+        String gScript = groovyScript;
         final CompilerConfiguration compiler = new CompilerConfiguration();
         if (mode == EvaluatingMode.G_STRING) {
-            groovyScript = GroovyUtil.asGString(groovyScript);
+            gScript = GroovyUtil.asGString(gScript);
         }
         if (delegatedObject != null && mode == EvaluatingMode.CLOSURE) {
             compiler.setScriptBaseClass(DelegatingScript.class.getName());
@@ -79,11 +80,11 @@ public class GroovyScript implements GroovyEvaluator {
         compiler.addCompilationCustomizers(customizer);
         if (delegatedObject != null && mode == EvaluatingMode.SCRIPT) {
             bindingMap.put("delegatedObject", delegatedObject);
-            groovyScript = "delegatedObject." + groovyScript;
+            gScript = "delegatedObject." + gScript; //NOPMD
         }
         Map<String, Object> bindingMapWithPrefix = bindingMap;
         if (bingPrefixInScript != null && bindingMap != null) {
-            if (GroovyUtil.isGString(groovyScript)) {
+            if (GroovyUtil.isGString(gScript)) {
                 // Use right prefix for Script by default ''
                 bindingMapWithPrefix = bindingMap.entrySet().stream()
                     .collect(Collectors.toMap(e -> bingPrefixInScript.getRight() + e.getKey(), Map.Entry::getValue));
@@ -97,23 +98,23 @@ public class GroovyScript implements GroovyEvaluator {
 
         final Script script;
         if (delegatedObject != null && mode == EvaluatingMode.CLOSURE) {
-            script = shell.parse(groovyScript);
+            script = shell.parse(gScript);
             ((DelegatingScript) script).setDelegate(delegatedObject);
         } else {
-            script = shell.parse(groovyScript);
+            script = shell.parse(gScript);
         }
 
         Object result;
-        if (tryAsMethod && !groovyScript.endsWith(")")) {
+        if (tryAsMethod && !gScript.endsWith(")")) {
             try {
                 result = script.run();
             } catch (GroovyRuntimeException e) {
                 if (delegatedObject != null) {
-                    final Script s = shell.parse(groovyScript);
+                    final Script s = shell.parse(gScript);
                     ((DelegatingScript) s).setDelegate(delegatedObject);
                     result = s.run();
                 } else {
-                    result = shell.parse(groovyScript).run();
+                    result = shell.parse(gScript).run();
                 }
             }
         } else {
