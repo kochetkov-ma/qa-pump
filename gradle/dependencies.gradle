@@ -28,10 +28,18 @@ dependencies {
     /* Apache commons */
     implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
     /* Guava */
-    implementation "com.google.guava:guava:$guavaVersion"
+    implementation ("com.google.guava:guava:$guavaVersion") {
+        exclude group: 'org.checkerframework'
+        exclude group: 'com.google.code.findbugs'
+        exclude group: 'com.google.errorprone'
+        exclude group: 'com.google.j2objc'
+    }
     /* Logging */
     implementation "org.slf4j:slf4j-api:$slf4jVersion"
-    runtimeOnly "ch.qos.logback:logback-classic:$logbackVersion"
+    runtimeOnly ("ch.qos.logback:logback-classic:$logbackVersion") {
+        exclude group: 'edu.washington.cs.types.checker'
+        exclude group: 'com.sun.mail'
+    }
     /* Testing */
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "org.assertj:assertj-core:$assertjVersion"
