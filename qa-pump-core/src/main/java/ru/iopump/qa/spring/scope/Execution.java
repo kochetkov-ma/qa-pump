@@ -12,11 +12,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import ru.iopump.qa.cucumber.event.TestExecutionStart;
 
 @SuppressWarnings("RedundantModifiersUtilityClassLombok")
 @UtilityClass
+@Slf4j
 public class Execution {
     private static final AtomicBoolean STARTED = new AtomicBoolean(false);
     private static final PostponeApplicationEventPublisher eventPublisher = new PostponeApplicationEventPublisher();
@@ -76,6 +78,9 @@ public class Execution {
 
     public static boolean setRunnerIfEmpty(@NonNull RunnerType newRunnerType) {
         synchronized (STARTED) {
+            if (log.isDebugEnabled()) {
+                log.debug("Try set runner. Argument: {}. Current value: {}", newRunnerType, getRunner());
+            }
             if (RUNNER_TYPE == null) {
                 RUNNER_TYPE = newRunnerType;
                 return true;

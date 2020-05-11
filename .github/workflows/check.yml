@@ -29,7 +29,7 @@ jobs:
         release.customPassword: ${{ secrets.GIT_HUB_TOKEN }}
       with:
         gradle-version: current
-        arguments: '--stacktrace
+        arguments: '--stacktrace --info
         -PossrhUsername=kochetkov-ma
         -PossrhPassword=${{ secrets.ossrhPassword }}
         -Psigning.key="${{ secrets.GPG_SIGNING_KEY }}"
