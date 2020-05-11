@@ -10,8 +10,6 @@ public final class FeatureScope implements Scope {
     @Override
     @Nonnull
     public Object get(@Nonnull String name, @Nonnull ObjectFactory<?> objectFactory) {
-        Execution.checkRunner();
-
         final FeatureCodeScope context = FeatureCodeScope.getInstance();
         Object obj = context.get(name);
         if (obj == null) {
