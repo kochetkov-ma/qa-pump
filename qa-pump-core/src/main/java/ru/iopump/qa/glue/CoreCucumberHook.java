@@ -19,7 +19,6 @@ import ru.iopump.qa.spring.scope.RunnerType;
  */
 public class CoreCucumberHook {
 
-
     private final ApplicationEventPublisher eventPublisher;
     private final Collection<String> directBindings;
     private final ScenarioVars scenarioVars;
@@ -79,5 +78,5 @@ public class CoreCucumberHook {
     private static boolean isNewFeature(@NonNull FeatureSpec featureFromPrevScenario, @NonNull Scenario newScenario) {
         return !featureFromPrevScenario.getUri().equalsIgnoreCase(newScenario.getUri().toString());
     }
-//endregion
+    //endregion
 }

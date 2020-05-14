@@ -3,12 +3,16 @@ package ru.iopump.qa.issue;
 import io.cucumber.java.en.Given;
 import io.cucumber.spring.CucumberContextConfiguration;
 import io.cucumber.spring.SpringFactory;
+import java.util.Collection;
+import java.util.Collections;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.test.context.ContextConfiguration;
+
 @Ignore
 public class Issue1970 {
 
@@ -38,8 +42,9 @@ public class Issue1970 {
          */
         @Bean
         // @Lazy // Lazy is workaround. But every bean in init chain must be lazy.
-        public String singletonBean(@Autowired String simpleGlueScopeBean) {
-            return simpleGlueScopeBean + " singleton";
+        public Collection<String> singletonBean(@Autowired Collection<String> simpleGlueScopeBean) {
+            simpleGlueScopeBean.add("1");
+            return simpleGlueScopeBean;
         }
 
         /**
@@ -47,9 +52,9 @@ public class Issue1970 {
          * I want use it in multi-thread scenario execution and Spring will manage it via scope.
          */
         @Bean
-        @Scope("cucumber-glue") // This is Cucumber Glue scope
-        public String simpleGlueScopeBean() {
-            return "cucumber-glue";
+        @Scope(value = "cucumber-glue", proxyMode = ScopedProxyMode.INTERFACES) // This is Cucumber Glue scope
+        public Collection<String> simpleGlueScopeBean() {
+            return Collections.emptyList();
         }
     }
 }
